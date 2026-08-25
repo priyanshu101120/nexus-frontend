@@ -1,4 +1,4 @@
-import { LoginInput, RegisterInput } from "@/hooks/type";
+import { CreateWorkspaceInput, LoginInput, RegisterInput } from "@/hooks/type";
 import { LogOut } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -39,6 +39,24 @@ export const authApi = {
   },
   getMe: () => {
     return apiRequest("/auth/me", {
+      method: "GET",
+    });
+  },
+};
+export const workspaceApi = {
+  createWorkspace: (payload: CreateWorkspaceInput) => {
+    return apiRequest("/workspace", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  getWorkspace: () => {
+    return apiRequest("/workspace", {
+      method: "GET",
+    });
+  },
+  getBySlug: (slug: string) => {
+    return apiRequest(`/workspace/${slug}`, {
       method: "GET",
     });
   },
