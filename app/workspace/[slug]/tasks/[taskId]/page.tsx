@@ -1,0 +1,1 @@
+import {TaskDetailPage} from '@/components/task-detail-page'; export default async function Page({params}:{params:Promise<{taskId:string}>}){const p=await params;return <TaskDetailPage taskId={p.taskId}/>}
