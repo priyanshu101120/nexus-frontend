@@ -42,6 +42,10 @@ export default function ProjectsPage() {
   return (
     <>
       <div className="mb-7 flex items-center justify-between">
+        <div className="pointer-events-none absolute left-[10%] top-32 h-72 w-72 rounded-full bg-[#8b7cff]/20 blur-[100px]" />
+
+      {/* Blue glow */}
+      <div className="pointer-events-none absolute right-[8%] top-56 h-80 w-80 rounded-full bg-[#8bd8ff]/20 blur-[110px]" />
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#6d5dfb]">
             Projects

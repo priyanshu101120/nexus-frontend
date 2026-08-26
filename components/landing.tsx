@@ -17,6 +17,7 @@ import {
 import { Button, Card, Avatar, Progress, Badge } from "./ui";
 import { projects, tasks, activities } from "@/lib/mock-data";
 import { useRouter } from "next/navigation";
+import GradientWaves from "./GradientWaves";
 const fade = {
   hidden: { opacity: 0, y: 28 },
   show: { opacity: 1, y: 0, transition: { duration: 0.65 } },
@@ -522,11 +523,33 @@ function Footer() {
 export function Landing() {
   const r = useRouter();
   return (
-    <div className="overflow-hidden bg-[#f7f7f4]">
+    <div className="overflow-hidden bg-black">
       <Nav />
       <section className="relative grid-bg px-4 pb-20 pt-36 sm:pt-44">
-        <div className="absolute left-[10%] top-32 h-72 w-72 rounded-full bg-[#8b7cff]/20 blur-[100px]" />
-        <div className="absolute right-[8%] top-56 h-80 w-80 rounded-full bg-[#8bd8ff]/20 blur-[110px]" />
+        <div className="pointer-events-none absolute inset-0 -z-0">
+          <GradientWaves
+            horizonColor="#ffffff"
+            waveColor="#ffd59f"
+            crestColor="#FFFFFF"
+            speed={0.4}
+            amplitude={2.5}
+            waveScale={0.6}
+            waveRatio={0.9}
+            swell={35}
+            turbulence={20}
+            tilt={1.11}
+            zoom={1}
+            height={5.5}
+            fogDepth={15}
+            detail="medium"
+            brightness={20}
+            opacity={2}
+            mouseInteraction={false}
+            parallaxStrength={0.5}
+            grain
+            grainIntensity={0.05}
+          />
+        </div>
         <div className="relative mx-auto max-w-5xl text-center">
           <motion.p
             initial={{ opacity: 0, y: 15 }}
@@ -539,7 +562,7 @@ export function Landing() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.08 }}
-            className="text-5xl font-black tracking-[-.06em] sm:text-7xl lg:text-[92px] lg:leading-[.98]"
+            className="text-5xl text-white font-black tracking-[-.06em] sm:text-7xl lg:text-[92px] lg:leading-[.98]"
           >
             Everything your team needs.
             <br />
@@ -552,7 +575,7 @@ export function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.16 }}
-            className="mx-auto mt-7 max-w-2xl text-base leading-7 text-[#737373] sm:text-lg"
+            className="mx-auto mt-7 max-w-2xl text-base leading-7 text-white sm:text-lg"
           >
             Nexus brings projects, tasks, people and progress together so your
             team can focus on meaningful work.
