@@ -1,1 +1,4 @@
-import {NotificationsPage} from '@/components/workspace-pages'; export default function Page(){return <NotificationsPage/>}
+import { NotificationsPage } from "@/components/workspace-pages";
+export default function Page() {
+  return <NotificationsPage />;
+}

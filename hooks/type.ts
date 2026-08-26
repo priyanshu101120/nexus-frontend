@@ -1,7 +1,6 @@
 // ─────────────────────────────────────────────────────────
-// Nexus — Shared Frontend Types
+// Nexus — Shared Frontend Types (canonical: @/hooks/type)
 // Mirror these EXACTLY against backend response shapes.
-// If a backend `select`/`include` changes, update here too.
 // ─────────────────────────────────────────────────────────
 
 export type WorkspaceRole = "OWNER" | "ADMIN" | "MEMBER";
@@ -14,7 +13,7 @@ export interface SafeUser {
   name: string;
   email: string;
   avatarUrl?: string | null;
-  createdAt: string; // ISO date string over the wire
+  createdAt: string;
 }
 
 export interface RegisterInput {
@@ -60,7 +59,7 @@ export interface CreateWorkspaceInput {
   slug: string;
 }
 
-// ── Members (list view — with nested user) ──────────────
+// ── Members ──────────────────────────────────────────────
 
 export interface MemberWithUser {
   id: string;
@@ -70,7 +69,7 @@ export interface MemberWithUser {
 }
 
 export interface UpdateMemberRoleInput {
-  role: Exclude<WorkspaceRole, "OWNER">; // OWNER can't be granted this way
+  role: Exclude<WorkspaceRole, "OWNER">;
 }
 
 // ── Invitations ──────────────────────────────────────────
@@ -113,7 +112,7 @@ export interface CreateProjectInput {
   name: string;
   description?: string;
   color?: string;
-  startDate?: string; // ISO datetime
+  startDate?: string;
   dueDate?: string;
 }
 
@@ -130,12 +129,10 @@ export interface Board {
   createdAt: string;
 }
 
-// What POST /projects returns: project + its freshly created board+columns
 export interface ProjectWithBoard extends Project {
   board: Board & { columns: Column[] };
 }
 
-// What GET /projects/:id returns: full nested board with tasks
 export interface ProjectWithFullBoard extends Project {
   board: Board & {
     columns: (Column & { tasks: Task[] })[];
@@ -206,14 +203,9 @@ export interface CreateCommentInput {
   content: string;
 }
 
-// ── API envelope helpers ─────────────────────────────────
-// Every backend error response looks like this (see error.middleware.ts)
+// ── API envelope ─────────────────────────────────────────
 
 export interface ApiErrorResponse {
   message: string;
-  errors?: Record<string, string[]>; // present on 400 validation errors
+  errors?: Record<string, string[]>;
 }
-
-// Generic wrapper if you want to type fetch/axios responses:
-// e.g. ApiResponse<{ workspace: WorkspaceWithMembers }>
-export type ApiResponse<T> = T;

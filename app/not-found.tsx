@@ -1,1 +1,20 @@
-import Link from 'next/link'; import {Button,Card} from '@/components/ui'; export default function NotFound(){return <main className="grid min-h-screen place-items-center bg-[#f7f7f4] p-6"><Card className="max-w-md p-10 text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#6D5DFB]/10 text-3xl font-black text-nexus">N</div><h1 className="mt-6 text-4xl font-bold">404</h1><p className="mt-2 text-sm text-[#777]">This Nexus page does not exist.</p><Link href="/workspace" className="mt-6 inline-block"><Button>Return to workspace</Button></Link></Card></main>}
+import Link from "next/link";
+import { Button, Card } from "@/components/ui";
+export default function NotFound() {
+  return (
+    <main className="grid min-h-screen place-items-center bg-[#f7f7f4] p-6">
+      <Card className="max-w-md p-10 text-center">
+        <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#6D5DFB]/10 text-3xl font-black text-nexus">
+          N
+        </div>
+        <h1 className="mt-6 text-4xl font-bold">404</h1>
+        <p className="mt-2 text-sm text-[#777]">
+          This Nexus page does not exist.
+        </p>
+        <Link href="/workspace" className="mt-6 inline-block">
+          <Button>Return to workspace</Button>
+        </Link>
+      </Card>
+    </main>
+  );
+}

@@ -10,25 +10,30 @@ import {
   List,
   Plus,
   Search,
+  LogOut,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Workspace, CreateWorkspaceInput } from "@/hooks/type";
 import useWorkspace from "@/hooks/useWorkspace";
+import { useAuth } from "@/context/Authcontext";
 
 export default function WorkspacePage() {
   const router = useRouter();
   const { workspace, loading, creating, error, createWorkspace } =
     useWorkspace();
+  const { logout } = useAuth();
   const [search, setSearch] = useState("");
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [showCreate, setShowCreate] = useState(false);
 
   // Only `name` and `slug` actually exist on the backend Workspace shape —
   // search/filter against those, nothing else.
   const filteredWorkspaces = useMemo(() => {
+    const list = workspace ?? [];
     const query = search.toLowerCase();
-    return workspace.filter(
+    return list.filter(
       (w) =>
         w.name.toLowerCase().includes(query) ||
         w.slug.toLowerCase().includes(query),
@@ -39,8 +44,23 @@ export default function WorkspacePage() {
     router.push(`/workspace/${ws.slug}/overview`);
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setShowProfileMenu(false);
+      router.push("/login");
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-[#f7f7f4] text-[#111]">
+    <main className="min-h-screen bg-[#f7f7f4] text-[#111] grid-bg">
+      <div className="pointer-events-none absolute left-[10%] top-32 h-72 w-72 rounded-full bg-[#8b7cff]/20 blur-[100px]" />
+
+      {/* Blue glow */}
+      <div className="pointer-events-none absolute right-[8%] top-56 h-80 w-80 rounded-full bg-[#8bd8ff]/20 blur-[110px]" />
       {/* Header */}
       <header className="border-b border-black/[0.06] bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
@@ -57,12 +77,52 @@ export default function WorkspacePage() {
               <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#6d5dfb]" />
             </button>
 
-            <button className="flex items-center gap-2 rounded-xl border border-black/[0.07] bg-white px-2 py-1.5">
-              <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#111] text-[10px] font-bold text-white">
-                P
-              </div>
-              <ChevronDown size={15} className="text-black/40" />
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowProfileMenu((prev) => !prev)}
+                className="flex items-center gap-2 rounded-xl border border-black/[0.07] bg-white px-2 py-1.5 transition hover:border-black/[0.12] hover:bg-black/[0.02]"
+              >
+                <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#111] text-[10px] font-bold text-white">
+                  P
+                </div>
+
+                <ChevronDown
+                  size={15}
+                  className={`text-black/40 transition-transform ${
+                    showProfileMenu ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {showProfileMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -5, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-[calc(100%+8px)] z-50 w-52 overflow-hidden rounded-2xl border border-black/[0.07] bg-white p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.12)]"
+                  >
+                    <div className="border-b border-black/[0.06] px-3 py-2.5">
+                      <p className="text-sm font-semibold">Profile</p>
+                      <p className="mt-0.5 text-xs text-black/40">
+                        Manage your account
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="mt-1 flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </header>
@@ -162,16 +222,29 @@ export default function WorkspacePage() {
             </div>
 
             {filteredWorkspaces.length > 0 ? (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredWorkspaces.map((ws, index) => (
-                  <WorkspaceCard
-                    key={ws.id}
-                    workspace={ws}
-                    index={index}
-                    onClick={() => openWorkspace(ws)}
-                  />
-                ))}
-              </div>
+              view === "grid" ? (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {filteredWorkspaces.map((ws, index) => (
+                    <WorkspaceCard
+                      key={ws.id}
+                      workspace={ws}
+                      index={index}
+                      onClick={() => openWorkspace(ws)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredWorkspaces.map((ws, index) => (
+                    <WorkspaceListItem
+                      key={ws.id}
+                      workspace={ws}
+                      index={index}
+                      onClick={() => openWorkspace(ws)}
+                    />
+                  ))}
+                </div>
+              )
             ) : (
               <EmptySearchState
                 hasSearch={!!search}

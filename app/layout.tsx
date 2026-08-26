@@ -1,3 +1,4 @@
+import { Authprovider } from "@/context/Authcontext";
 import "./globals.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -9,7 +10,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}
+      <body>
+        <Authprovider>{children}</Authprovider>
         <Toaster position="top-right" richColors />
       </body>
     </html>
