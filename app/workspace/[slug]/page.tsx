@@ -1,1 +1,9 @@
-import {Overview} from '@/components/workspace-pages'; export default function Page(){return <Overview/>}
+import React from 'react'
+
+const page = () => {
+  return (
+    <div>page</div>
+  )
+}
+
+export default page

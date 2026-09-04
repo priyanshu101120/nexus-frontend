@@ -1,1 +1,12 @@
-'use client'; import {ErrorState} from '@/components/shared'; export default function Error(){return <div className="min-h-screen bg-[#f7f7f4] p-6"><ErrorState title="Workspace error" description="The workspace could not be displayed. Try again."/></div>}
+"use client";
+import { ErrorState } from "@/components/shared";
+export default function Error() {
+  return (
+    <div className="min-h-screen bg-[#f7f7f4] p-6">
+      <ErrorState
+        title="Workspace error"
+        description="The workspace could not be displayed. Try again."
+      />
+    </div>
+  );
+}

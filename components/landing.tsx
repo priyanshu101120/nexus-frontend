@@ -184,7 +184,7 @@ function Mosaic() {
         <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-nexus">
           Everything connected
         </p>
-        <h2 className="text-4xl font-bold tracking-tight sm:text-6xl">
+        <h2 className=" text-white text-4xl font-bold tracking-tight sm:text-6xl">
           A workspace that moves at the speed of your team.
         </h2>
       </div>
@@ -323,14 +323,14 @@ function Kanban() {
           <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-nexus">
             Task management
           </p>
-          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">
+          <h2 className="text-white text-4xl font-bold tracking-tight sm:text-5xl">
             From idea to done. Without the chaos.
           </h2>
           <p className="mt-5 leading-7 text-[#737373]">
             Give every task a clear owner, priority and next step. Your team
             sees the same work, in the same place.
           </p>
-          <div className="mt-7 space-y-3 text-sm">
+          <div className="text-white mt-7 space-y-3 text-sm">
             {[
               "Clear ownership",
               "Flexible workflows",
@@ -601,9 +601,7 @@ export function Landing() {
             </Button>
           </div>
         </div>
-        <div id="preview" className="mt-20">
-          <ProductPreview />
-        </div>
+       
       </section>
       <Mosaic />
       <Kanban />
