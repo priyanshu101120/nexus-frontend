@@ -94,18 +94,23 @@ export function PageHeader({
   title,
   description,
   children,
+  slug,
+  routerLink,
 }: {
   title: string;
+  slug: string;
+  routerLink: string;
   description?: string;
-  children?: ReactNode;
+  children?: ReactNode; 
 }) {
+  const router=useRouter()
   return (
     <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <p className="mb-1 text-xs font-semibold uppercase tracking-[.18em] text-nexus">
           Nexus workspace
         </p>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 onClick={() => router.push(routerLink)} className="text-3xl font-bold tracking-tight cursor-pointer hover:text-nexus sm:text-4xl">
           {title}
         </h1>
         {description && (
@@ -229,55 +234,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <aside className="fixed bottom-0 left-0 top-16 hidden w-64 border-r border-black/[.06] bg-white/45 px-3 py-5 lg:block dark:border-white/[.07] dark:bg-white/[.02]">
-        <div className="mb-5 px-3 text-[10px] font-bold uppercase tracking-[.2em] text-[#aaa]">
-          Workspace
-        </div>
-        {links.map(([label, key, Icon]) => {
-          let active = path.includes("/" + key);
-          return (
-            <button
-              key={key}
-              onClick={() => r.push(`/workspace/nexus-studio/${key}`)}
-              className={
-                "mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium " +
-                (active
-                  ? "bg-[#6D5DFB]/10 text-nexus"
-                  : "text-[#666] hover:bg-black/5")
-              }
-            >
-              <Icon size={17} />
-              {label}
-            </button>
-          );
-        })}
-        <div className="my-5 border-t border-black/5" />
-        <button
-          onClick={() => r.push("/workspace/nexus-studio/notifications")}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[#666] hover:bg-black/5"
-        >
-          <Bell size={17} />
-          Notifications
-        </button>
-        <button
-          onClick={() => r.push("/workspace/nexus-studio/settings/general")}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[#666] hover:bg-black/5"
-        >
-          <Settings size={17} />
-          Settings
-        </button>
-        <div className="absolute bottom-4 left-3 right-3">
-          <div className="rounded-2xl bg-black/[.03] p-3">
-            <div className="flex items-center gap-2">
-              <Avatar name="Priyanshu" size="sm" />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold">Priyanshu</p>
-                <p className="truncate text-[10px] text-[#888]">Owner</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
+     
       {mobile && (
         <div
           className="fixed inset-0 z-50 bg-black/30 lg:hidden"
@@ -331,7 +288,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
           </aside>
         </div>
       )}
-      <main className="px-4 pb-12 pt-24 lg:ml-64 lg:px-8">{children}</main>
+      <main >{children}</main>
     </div>
   );
 }

@@ -1,9 +1,19 @@
-import { ProjectDetail } from "@/components/workspace-pages";
+import  ProjectDetail  from "@/components/project/ProjectDetail";
+import { ProjectProvider } from "@/context/ProjectContext";
+
 export default async function Page({
   params,
 }: {
-  params: Promise<{ projectId: string }>;
+  params: Promise<{
+    slug: string;
+    projectId: string;
+  }>;
 }) {
-  const p = await params;
-  return <ProjectDetail projectId={p.projectId} />;
+  const { slug, projectId } = await params;
+
+  return (
+    <ProjectProvider slug={slug} projectId={projectId}>
+      <ProjectDetail/>
+    </ProjectProvider>
+  );
 }

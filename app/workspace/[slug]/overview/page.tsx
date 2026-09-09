@@ -1,30 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useWorkspaceContext } from "@/context/WorkspaceContext";
-import { projectApi } from "@/lib/api";
-import { Project } from "@/hooks/type";
+
+import useProject from "@/hooks/useProject";
 
 export default function WorkspaceOverviewPage() {
+  const { projects } = useProject();
+  console.log("projects", projects);
   const { workspace, members } = useWorkspaceContext();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loadingProjects, setLoadingProjects] = useState(true);
 
-  useEffect(() => {
-    if (!workspace) return;
-    (async () => {
-      try {
-        const data = await projectApi.list(workspace.slug);
-        setProjects(data.projects ?? []);
-      } catch {
-        setProjects([]);
-      } finally {
-        setLoadingProjects(false);
-      }
-    })();
-  }, [workspace]);
-
-  if (!workspace) return null; // layout already handles loading/error states
+  if (!workspace) return null;
 
   return (
     <section className="bg-grid">
@@ -43,9 +28,7 @@ export default function WorkspaceOverviewPage() {
       <div className="mt-10 grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-black/[0.06] bg-white p-6">
           <p className="text-xs text-black/40">Projects</p>
-          <p className="mt-2 text-3xl font-black">
-            {loadingProjects ? "…" : projects.length}
-          </p>
+          <p className="mt-2 text-3xl font-black">{projects.length}</p>
         </div>
 
         <div className="rounded-2xl border border-black/[0.06] bg-white p-6">
