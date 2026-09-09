@@ -14,10 +14,11 @@ import {
   Play,
   ChevronRight,
 } from "lucide-react";
-import { Button, Card, Avatar, Progress, Badge } from "./ui";
+import { Button, Card, Avatar, Progress, Badge } from "../ui";
 import { projects, tasks, activities } from "@/lib/mock-data";
 import { useRouter } from "next/navigation";
-import GradientWaves from "./GradientWaves";
+import { CloudField } from "@designcodeio/threeui/components/CloudField";
+import "@designcodeio/threeui/style.css";
 const fade = {
   hidden: { opacity: 0, y: 28 },
   show: { opacity: 1, y: 0, transition: { duration: 0.65 } },
@@ -25,10 +26,10 @@ const fade = {
 function Nav() {
   const r = useRouter();
   return (
-    <nav className="fixed inset-x-0 top-4 z-50 mx-auto flex max-w-6xl items-center justify-between rounded-2xl border border-black/[.07] bg-white/70 px-4 py-3 shadow-soft backdrop-blur-xl">
+    <nav className="fixed inset-x-0 top-4 z-50 mx-auto flex max-w-6xl items-center justify-between backdrop-blur-xl rounded-2xl border border-white/10 bg-transparent px-4 py-3 shadow-soft">
       <button
         onClick={() => scrollTo(0, 0)}
-        className="text-lg font-black tracking-[-.06em]"
+        className="text-lg text-white font-black tracking-[-.06em]"
       >
         NEXUS<span className="text-nexus">.</span>
       </button>
@@ -527,49 +528,22 @@ export function Landing() {
       <Nav />
       <section className="relative grid-bg px-4 pb-20 pt-36 sm:pt-44">
         <div className="pointer-events-none absolute inset-0 -z-0">
-          <GradientWaves
-            horizonColor="#ffffff"
-            waveColor="#ffd59f"
-            crestColor="#FFFFFF"
-            speed={0.4}
-            amplitude={2.5}
-            waveScale={0.6}
-            waveRatio={0.9}
-            swell={35}
-            turbulence={20}
-            tilt={1.11}
-            zoom={1}
-            height={5.5}
-            fogDepth={15}
-            detail="medium"
-            brightness={20}
-            opacity={2}
-            mouseInteraction={false}
-            parallaxStrength={0.5}
-            grain
-            grainIntensity={0.05}
-          />
+          <div style={{ width: "100%", height: "700px", position: "relative" }}>
+            <CloudField mode="dark" />
+          </div>
         </div>
         <div className="relative mx-auto max-w-5xl text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mx-auto mb-5 w-fit rounded-full border border-black/10 bg-white/60 px-4 py-2 text-[11px] font-bold tracking-[.18em] text-[#666]"
-          >
-            THE WORKSPACE FOR MODERN TEAMS
-          </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.08 }}
             className="text-5xl text-white font-black tracking-[-.06em] sm:text-7xl lg:text-[92px] lg:leading-[.98]"
           >
-            Everything your team needs.
+            Build. Organize.
             <br />
             <span className="bg-gradient-to-r from-[#6D5DFB] via-[#8b7cff] to-[#55b6ff] bg-clip-text text-transparent">
-              Connected
+              Move forward.
             </span>{" "}
-            in one place.
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -577,8 +551,9 @@ export function Landing() {
             transition={{ delay: 0.16 }}
             className="mx-auto mt-7 max-w-2xl text-base leading-7 text-white sm:text-lg"
           >
-            Nexus brings projects, tasks, people and progress together so your
-            team can focus on meaningful work.
+            Your team's work.
+            <br />
+            Finally CONNECTED.
           </motion.p>
           <div className="mt-8 flex justify-center gap-3">
             <Button
@@ -601,7 +576,6 @@ export function Landing() {
             </Button>
           </div>
         </div>
-       
       </section>
       <Mosaic />
       <Kanban />
