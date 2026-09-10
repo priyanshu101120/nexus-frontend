@@ -18,7 +18,7 @@ export function Button({
         variant === "primary" && "bg-[#111] text-white hover:bg-nexus",
         variant === "secondary" &&
           "border border-black/10 bg-white/70 text-[#111] hover:border-nexus/30",
-        variant === "ghost" && "text-[#555] hover:bg-black/5 hover:text-[#111]",
+        variant === "ghost" && "text-[#555] hover:bg-black/5 hover:text-white",
         variant === "danger" && "bg-red-50 text-red-600 hover:bg-red-100",
         className,
       )}

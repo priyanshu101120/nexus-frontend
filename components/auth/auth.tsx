@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Check, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { Button, Card, Input } from "./ui";
+import { Button, Card, Input } from "../ui";
 import { useAuth } from "@/context/Authcontext";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ export function Auth() {
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -32,10 +33,12 @@ export function Auth() {
         setErrorMessage("Please enter your name.");
         return;
       }
+
       if (!confirmPassword) {
         setErrorMessage("Please confirm your password.");
         return;
       }
+
       if (password !== confirmPassword) {
         setErrorMessage("Passwords do not match.");
         return;
@@ -43,20 +46,27 @@ export function Auth() {
     }
 
     try {
+      setLoading(true);
+
       if (mode === "register") {
         await register({ name, email, password });
+
         toast.success("Account created successfully!");
         r.push("/workspace");
       } else {
         await login({ email, password });
+
         toast.success("Login successful!");
         r.push("/workspace");
       }
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Something went wrong.";
+
       setErrorMessage(message);
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,10 +87,33 @@ export function Auth() {
     if (/[0-9]/.test(password)) score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
 
-    if (score <= 2) return { label: "Weak", width: "w-1/4", text: "text-red-500", bar: "bg-red-500" };
-    if (score <= 4) return { label: "Fair", width: "w-2/4", text: "text-amber-500", bar: "bg-amber-500" };
-    if (score === 5) return { label: "Good", width: "w-3/4", text: "text-emerald-500", bar: "bg-emerald-500" };
-    return { label: "Strong", width: "w-full", text: "text-emerald-600", bar: "bg-emerald-600" };
+    if (score <= 2)
+      return {
+        label: "Weak",
+        width: "w-1/4",
+        text: "text-red-500",
+        bar: "bg-red-500",
+      };
+    if (score <= 4)
+      return {
+        label: "Fair",
+        width: "w-2/4",
+        text: "text-amber-500",
+        bar: "bg-amber-500",
+      };
+    if (score === 5)
+      return {
+        label: "Good",
+        width: "w-3/4",
+        text: "text-emerald-500",
+        bar: "bg-emerald-500",
+      };
+    return {
+      label: "Strong",
+      width: "w-full",
+      text: "text-emerald-600",
+      bar: "bg-emerald-600",
+    };
   };
   const passwordStrength = getPasswordStrength(password);
 
@@ -154,7 +187,9 @@ export function Auth() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {mode === "register" && (
                   <label className="block">
-                    <span className="mb-1.5 block text-xs font-semibold">Name</span>
+                    <span className="mb-1.5 block text-xs font-semibold">
+                      Name
+                    </span>
                     <Input
                       placeholder="Priyanshu"
                       required
@@ -165,7 +200,9 @@ export function Auth() {
                 )}
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold">Email</span>
+                  <span className="mb-1.5 block text-xs font-semibold">
+                    Email
+                  </span>
                   <Input
                     type="email"
                     placeholder="you@example.com"
@@ -176,7 +213,9 @@ export function Auth() {
                 </label>
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold">Password</span>
+                  <span className="mb-1.5 block text-xs font-semibold">
+                    Password
+                  </span>
                   <div className="relative">
                     <Input
                       type={show ? "text" : "password"}
@@ -198,7 +237,9 @@ export function Auth() {
 
                 {mode === "register" && (
                   <label className="block">
-                    <span className="mb-1.5 block text-xs font-semibold">Confirm password</span>
+                    <span className="mb-1.5 block text-xs font-semibold">
+                      Confirm password
+                    </span>
                     <div className="relative">
                       <Input
                         type={show ? "text" : "password"}
@@ -250,7 +291,11 @@ export function Auth() {
                 {mode === "login" && (
                   <div className="flex items-center justify-between text-xs">
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded border-black/20" /> Remember me
+                      <input
+                        type="checkbox"
+                        className="rounded border-black/20"
+                      />{" "}
+                      Remember me
                     </label>
                     <button type="button" className="font-semibold text-nexus">
                       Forgot password?
@@ -262,8 +307,18 @@ export function Auth() {
                   <p className="text-xs text-red-500">{errorMessage}</p>
                 )}
 
-                <Button type="submit" className="w-full py-3">
-                  {mode === "login" ? "Login" : "Create account"}
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3"
+                >
+                  {loading
+                    ? mode === "login"
+                      ? "Login..."
+                      : "Creating account..."
+                    : mode === "login"
+                      ? "Login"
+                      : "Create account"}
                 </Button>
 
                 <div className="flex items-center gap-3 py-2 text-xs text-[#aaa]">
@@ -272,7 +327,11 @@ export function Auth() {
                   <div className="h-px flex-1 bg-black/10" />
                 </div>
 
-                <Button type="button" variant="secondary" className="w-full py-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="w-full py-3"
+                >
                   Continue with Google
                 </Button>
               </form>
@@ -286,7 +345,9 @@ export function Auth() {
             <p className="mt-5 text-center text-sm text-[#777]">
               {mode === "login" ? "New to Nexus?" : "Already have an account?"}{" "}
               <button
-                onClick={() => switchMode(mode === "login" ? "register" : "login")}
+                onClick={() =>
+                  switchMode(mode === "login" ? "register" : "login")
+                }
                 className="font-bold text-nexus"
               >
                 {mode === "login" ? "Create account" : "Login"}

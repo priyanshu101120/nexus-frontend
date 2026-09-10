@@ -19,6 +19,7 @@ import { projects, tasks, activities } from "@/lib/mock-data";
 import { useRouter } from "next/navigation";
 import { CloudField } from "@designcodeio/threeui/components/CloudField";
 import "@designcodeio/threeui/style.css";
+import { MagnetizeButton } from "../ui/magnetize-Button";
 const fade = {
   hidden: { opacity: 0, y: 28 },
   show: { opacity: 1, y: 0, transition: { duration: 0.65 } },
@@ -556,12 +557,13 @@ export function Landing() {
             Finally CONNECTED.
           </motion.p>
           <div className="mt-8 flex justify-center gap-3">
-            <Button
+           
+            <MagnetizeButton
               className="rounded-full px-6 py-3"
               onClick={() => r.push("/register")}
             >
               Start building <ArrowRight size={16} />
-            </Button>
+            </MagnetizeButton>
             <Button
               variant="secondary"
               className="rounded-full px-6"
