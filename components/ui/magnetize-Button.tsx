@@ -67,7 +67,7 @@ function MagnetizeButton({
     return (
         <Button
             className={cn(
-                "min-w-40 relative touch-none py-3 h-10",
+                "min-w-40 relative touch-none py-4 h-11",
                 "bg-violet-100 dark:bg-violet-900",
                 "hover:bg-violet-200 dark:hover:bg-violet-800",
                 "text-violet-600 dark:text-violet-300",

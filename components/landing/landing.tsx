@@ -559,7 +559,7 @@ export function Landing() {
           <div className="mt-8 flex justify-center gap-3">
            
             <MagnetizeButton
-              className="rounded-full px-6 py-3"
+              className="rounded-full py-3"
               onClick={() => r.push("/register")}
             >
               Start building <ArrowRight size={16} />

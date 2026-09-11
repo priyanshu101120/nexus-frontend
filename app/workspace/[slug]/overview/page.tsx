@@ -6,7 +6,6 @@ import useProject from "@/hooks/useProject";
 
 export default function WorkspaceOverviewPage() {
   const { projects } = useProject();
-  console.log("projects", projects);
   const { workspace, members } = useWorkspaceContext();
 
   if (!workspace) return null;

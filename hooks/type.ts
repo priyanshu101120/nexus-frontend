@@ -6,6 +6,43 @@
 export type WorkspaceRole = "OWNER" | "ADMIN" | "MEMBER";
 export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
 
+export type NotificationType = "INVITATION" | "GENERAL";
+
+export interface Notification {
+  id: string;
+  message: string;
+  type: NotificationType;
+  read: boolean;
+  createdAt: string;
+  userId: string;
+
+  invitationId?: string | null;
+
+  invitation?: {
+    id: string;
+    email: string;
+    role: "ADMIN" | "MEMBER";
+    token: string;
+    accepted: boolean;
+    workspaceId: string;
+    invitedById: string;
+
+    workspace: {
+      id: string;
+      name: string;
+      slug: string;
+    };
+
+    invitedBy: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  } | null;
+}
+
+
+
 // ── Auth ─────────────────────────────────────────────────
 
 export interface SafeUser {
@@ -147,6 +184,17 @@ export interface TaskAssignee {
   avatarUrl?: string | null;
 }
 
+export interface TaskColumnInfo {
+  id: string;
+  name: string;
+  board?: {
+    project: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -159,6 +207,7 @@ export interface Task {
   columnId: string;
   assigneeId?: string | null;
   assignee?: TaskAssignee | null;
+  column?: TaskColumnInfo; // <-- ADD THIS LINE (optional — only present on the flat workspace-tasks response)
 }
 
 export interface CreateTaskInput {

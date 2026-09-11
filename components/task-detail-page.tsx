@@ -1,2 +1,99 @@
-'use client'; import {useRouter} from 'next/navigation'; import {ArrowLeft,CalendarDays,MessageCircle,Paperclip,Send} from 'lucide-react'; import {WorkspaceShell} from './shared'; import {Avatar,Badge,Button,Card,Input} from './ui'; import {members,tasks} from '@/lib/mock-data';
-export function TaskDetailPage({taskId}:{taskId:string}){const r=useRouter();const t=tasks.find(x=>x.id===taskId)||tasks[0];return <WorkspaceShell><button onClick={()=>r.back()} className="mb-6 flex items-center gap-2 text-xs text-[#777]"><ArrowLeft size={15}/>Back</button><div className="grid gap-5 lg:grid-cols-[1fr_300px]"><Card className="p-6 sm:p-8"><div className="flex items-center justify-between"><Badge tone="purple">{t.project}</Badge><button className="text-[#aaa]">•••</button></div><h1 className="mt-6 text-3xl font-bold">{t.title}</h1><p className="mt-3 max-w-2xl text-sm leading-7 text-[#777]">{t.description||'Keep the task context visible and make the next step obvious for everyone involved.'}</p><div className="mt-8 flex flex-wrap gap-2">{t.labels.map(x=><Badge key={x}>{x}</Badge>)}</div><div className="mt-10 border-t border-black/5 pt-7"><h2 className="font-bold">Comments</h2>{['Looks good — I tightened the spacing.','Can we review this with the mobile state?','Shipped the latest pass.'].map((x,i)=><div className="mt-5 flex gap-3" key={x}><Avatar name={members[i].name}/><div><p className="text-xs font-semibold">{members[i].name}</p><div className="mt-1 rounded-2xl bg-black/[.025] p-3 text-xs leading-5 text-[#777]">{x}</div></div></div>)}<div className="mt-7 flex gap-2"><Input placeholder="Write a comment..."/><Button><Send size={15}/></Button></div></div></Card><Card className="h-fit p-5"><h2 className="font-bold">Task details</h2>{[['Status',t.status],['Priority',t.priority],['Assignee',t.assignee],['Due date',t.dueDate]].map(x=><div className="mt-5 flex items-center gap-3" key={x[0]}><div className="grid h-8 w-8 place-items-center rounded-lg bg-black/5">{x[0]==='Due date'?<CalendarDays size={14}/>:x[0]==='Assignee'?<Avatar name={t.assignee} size="sm"/>:<MessageCircle size={14}/>}</div><div><p className="text-[10px] uppercase tracking-widest text-[#aaa]">{x[0]}</p><p className="mt-1 text-xs font-semibold">{x[1]}</p></div></div>)}<div className="mt-7 border-t border-black/5 pt-5"><p className="text-xs font-semibold">Attachments</p><button className="mt-3 flex items-center gap-2 text-xs text-nexus"><Paperclip size={14}/>Add attachment</button></div></Card></div></WorkspaceShell>}
+"use client";
+
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+
+import { taskApi } from "@/lib/api";
+import type { Task } from "@/hooks/type";
+import { Card } from "@/components/ui";
+
+export function TaskDetailPage({
+  slug,
+  taskId,
+}: {
+  slug: string;
+  taskId: string;
+}) {
+  const [task, setTask] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadTask = async () => {
+      try {
+        setLoading(true);
+
+        const data = await taskApi.getById(slug, taskId);
+
+        setTask(data.task);
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load task"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTask();
+  }, [slug, taskId]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <Loader2
+          size={22}
+          className="animate-spin text-black/40"
+        />
+      </div>
+    );
+  }
+
+  if (error || !task) {
+    return (
+      <Card className="p-8 text-center">
+        <h1 className="font-semibold">
+          Task not found
+        </h1>
+
+        <p className="mt-2 text-sm text-black/40">
+          {error || "This task does not exist."}
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <section>
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#6d5dfb]">
+        Task
+      </p>
+
+      <h1 className="mt-2 text-3xl font-black">
+        {task.title}
+      </h1>
+
+      <p className="mt-3 text-sm text-black/50">
+        {task.description || "No description yet."}
+      </p>
+
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <Card className="p-5">
+          <p className="text-xs text-black/40">Priority</p>
+          <p className="mt-2 font-semibold">
+            {task.priority}
+          </p>
+        </Card>
+
+        <Card className="p-5">
+          <p className="text-xs text-black/40">Assignee</p>
+          <p className="mt-2 font-semibold">
+            {task.assignee?.name ?? "Unassigned"}
+          </p>
+        </Card>
+      </div>
+    </section>
+  );
+}

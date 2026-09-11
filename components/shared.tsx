@@ -94,12 +94,8 @@ export function PageHeader({
   title,
   description,
   children,
-  slug,
-  routerLink,
 }: {
   title: string;
-  slug: string;
-  routerLink: string;
   description?: string;
   children?: ReactNode; 
 }) {
@@ -110,7 +106,7 @@ export function PageHeader({
         <p className="mb-1 text-xs font-semibold uppercase tracking-[.18em] text-nexus">
           Nexus workspace
         </p>
-        <h1 onClick={() => router.push(routerLink)} className="text-3xl font-bold tracking-tight cursor-pointer hover:text-nexus sm:text-4xl">
+        <h1  className="text-3xl font-bold tracking-tight cursor-pointer hover:text-nexus sm:text-4xl">
           {title}
         </h1>
         {description && (

@@ -98,7 +98,7 @@ export const invitationApi = {
     apiRequest(`/workspace/${slug}/invitations`, { method: "GET" }),
 
   accept: (token: string) =>
-    apiRequest(`/invitation/${token}/accept`, { method: "POST" }),
+    apiRequest(`/invitations/${token}/accept`, { method: "POST" }),
 };
 
 // ── Projects & Boards ────────────────────────────────────
@@ -163,6 +163,11 @@ export const taskApi = {
     apiRequest(`/workspace/${slug}/projects/${projectId}/tasks/${taskId}`, {
       method: "DELETE",
     }),
+     list: (slug: string) =>
+    apiRequest(`/workspace/${slug}/tasks`),
+
+  getById: (slug: string, taskId: string) =>
+    apiRequest(`/workspace/${slug}/tasks/${taskId}`),
 };
 
 // ── Comments ─────────────────────────────────────────────
@@ -197,4 +202,19 @@ export const commentApi = {
         method: "DELETE",
       },
     ),
+};
+
+export const notificationApi = {
+  list: () =>
+    apiRequest("/notifications"),
+
+  markAsRead: (id: string) =>
+    apiRequest(`/notifications/${id}/read`, {
+      method: "PATCH",
+    }),
+
+  markAllAsRead: () =>
+    apiRequest("/notifications/read-all", {
+      method: "PATCH",
+    }),
 };

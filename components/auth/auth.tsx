@@ -7,10 +7,18 @@ import { Button, Card, Input } from "../ui";
 import { useAuth } from "@/context/Authcontext";
 import { toast } from "sonner";
 
-export function Auth() {
+type AuthProps = {
+  initialMode?: "login" | "register";
+  inviteToken?: string | null;
+};
+
+export function Auth({
+  initialMode = "login",
+  inviteToken,
+}: AuthProps) {
   const { login, register } = useAuth();
   const r = useRouter();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register">(initialMode );
   const [show, setShow] = useState(false);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -52,12 +60,20 @@ export function Auth() {
         await register({ name, email, password });
 
         toast.success("Account created successfully!");
-        r.push("/workspace");
+        if (inviteToken) {
+  r.push(`/invitations/${inviteToken}`);
+} else {
+  r.push("/workspace");
+}
       } else {
         await login({ email, password });
 
         toast.success("Login successful!");
-        r.push("/workspace");
+        if (inviteToken) {
+  r.push(`/invitations/${inviteToken}`);
+} else {
+  r.push("/workspace");
+}
       }
     } catch (error: unknown) {
       const message =
