@@ -12,7 +12,7 @@ import {
   UpdateMemberRoleInput,
 } from "@/hooks/type";
 
-const API_URL = process.env.NEXT_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function apiRequest(endpoint: string, options: RequestInit = {}) {
   const res = await fetch(`${API_URL}${endpoint}`, {
