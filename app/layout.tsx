@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 import { JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const jetbrainsMono = JetBrains_Mono({subsets:['latin'],variable:'--font-mono'});
 
@@ -16,7 +17,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={cn("font-mono", jetbrainsMono.variable)}>
       <body>
-        <Authprovider>{children}</Authprovider>
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+          <Authprovider>{children}</Authprovider>
+        </GoogleOAuthProvider>
         <Toaster position="top-right" richColors />
       </body>
     </html>

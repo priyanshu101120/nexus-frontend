@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Plus, Send, Loader2, X } from "lucide-react";
-import { Task, Column as ColumnType, TaskPriority } from "@/hooks/type";
+import { Task, Column as ColumnType, TaskPriority, MemberWithUser } from "@/hooks/type";
 import { TaskCard } from "./TaskCard";
 
 const PRIORITIES: TaskPriority[] = ["LOW", "MEDIUM", "HIGH"];
@@ -18,24 +18,28 @@ const PRIORITY_PILL_ACTIVE: Record<TaskPriority, string> = {
 export function BoardColumn({
   column,
   tasks,
+  members,
   onTaskClick,
   onAddTask,
 }: {
   column: ColumnType;
   tasks: Task[];
+  members: MemberWithUser[];
   onTaskClick: (task: Task) => void;
-  onAddTask: (title: string, priority: TaskPriority) => Promise<void>;
+  onAddTask: (title: string, priority: TaskPriority, assigneeId?: string) => Promise<void>;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id, data: { type: "column" } });
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState<TaskPriority>("MEDIUM");
+  const [assigneeId, setAssigneeId] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
   const closeForm = () => {
     setAdding(false);
     setTitle("");
     setPriority("MEDIUM");
+    setAssigneeId("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,7 +47,7 @@ export function BoardColumn({
     if (!title.trim() || submitting) return;
     try {
       setSubmitting(true);
-      await onAddTask(title.trim(), priority);
+      await onAddTask(title.trim(), priority, assigneeId || undefined);
       closeForm();
     } finally {
       setSubmitting(false);
@@ -81,8 +85,22 @@ export function BoardColumn({
             className="w-full rounded-lg border border-black/10 px-2.5 py-2 text-xs outline-none focus:border-[#6d5dfb]/40 disabled:opacity-60"
           />
 
-          <div className="flex items-center justify-between gap-3">
-            {/* Priority pills — same idea as an effort selector: pick one before sending */}
+          {/* Assignee dropdown — any current workspace member */}
+          <select
+            value={assigneeId}
+            onChange={(e) => setAssigneeId(e.target.value)}
+            disabled={submitting}
+            className="w-full rounded-lg border border-black/10 bg-white px-2.5 py-2 text-xs outline-none focus:border-[#6d5dfb]/40 disabled:opacity-60"
+          >
+            <option value="">Unassigned</option>
+            {members.map((m) => (
+              <option key={m.user.id} value={m.user.id}>
+                {m.user.name}
+              </option>
+            ))}
+          </select>
+
+          <div className="flex items-center justify-between gap-2">
             <div className="flex gap-1">
               {PRIORITIES.map((p) => (
                 <button

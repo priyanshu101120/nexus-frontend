@@ -51,6 +51,10 @@ export const authApi = {
   logout: () => apiRequest("/auth/logout", { method: "POST" }),
 
   getMe: () => apiRequest("/auth/me", { method: "GET" }),
+  // Add this method inside your existing `authApi` object in lib/api.ts:
+
+google: (idToken: string) =>
+  apiRequest("/auth/google", { method: "POST", body: JSON.stringify({ idToken }) }),
 };
 
 // ── Workspaces ───────────────────────────────────────────

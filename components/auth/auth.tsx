@@ -6,19 +6,17 @@ import { FormEvent, useState } from "react";
 import { Button, Card, Input } from "../ui";
 import { useAuth } from "@/context/Authcontext";
 import { toast } from "sonner";
+import { GoogleLogin } from "@react-oauth/google";
 
 type AuthProps = {
   initialMode?: "login" | "register";
   inviteToken?: string | null;
 };
 
-export function Auth({
-  initialMode = "login",
-  inviteToken,
-}: AuthProps) {
-  const { login, register } = useAuth();
+export function Auth({ initialMode = "login", inviteToken }: AuthProps) {
+  const { login, register, loginWithGoogle } = useAuth();
   const r = useRouter();
-  const [mode, setMode] = useState<"login" | "register">(initialMode );
+  const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [show, setShow] = useState(false);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -61,19 +59,19 @@ export function Auth({
 
         toast.success("Account created successfully!");
         if (inviteToken) {
-  r.push(`/invitations/${inviteToken}`);
-} else {
-  r.push("/workspace");
-}
+          r.push(`/invitations/${inviteToken}`);
+        } else {
+          r.push("/workspace");
+        }
       } else {
         await login({ email, password });
 
         toast.success("Login successful!");
         if (inviteToken) {
-  r.push(`/invitations/${inviteToken}`);
-} else {
-  r.push("/workspace");
-}
+          r.push(`/invitations/${inviteToken}`);
+        } else {
+          r.push("/workspace");
+        }
       }
     } catch (error: unknown) {
       const message =
@@ -83,6 +81,22 @@ export function Auth({
       toast.error(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      if (!credentialResponse.credential) {
+        throw new Error("No credential returned from Google");
+      }
+      await loginWithGoogle(credentialResponse.credential);
+      toast.success("Logged in with Google!");
+      r.push("/workspace");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Google login failed.";
+      setErrorMessage(message);
+      toast.error(message);
     }
   };
 
@@ -343,13 +357,15 @@ export function Auth({
                   <div className="h-px flex-1 bg-black/10" />
                 </div>
 
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full py-3"
-                >
-                  Continue with Google
-                </Button>
+                <div className="flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => toast.error("Google login failed.")}
+                    theme="outline"
+                    shape="pill"
+                    width="100%"
+                  />
+                </div>
               </form>
             </Card>
 

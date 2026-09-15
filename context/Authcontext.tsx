@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { LoginInput, RegisterInput, SafeUser } from "@/hooks/type";
 import { authApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ interface AuthContextValue {
   login: (payload: LoginInput) => Promise<void>;
   register: (payload: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>; // <-- ADD
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -46,9 +47,13 @@ export function Authprovider({ children }: { children: React.ReactNode }) {
     setUser(null);
     router.push("/login");
   }, [router]);
+  const loginWithGoogle = useCallback(async (idToken: string) => {
+    const data = await authApi.google(idToken);
+    setUser(data.user);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );
