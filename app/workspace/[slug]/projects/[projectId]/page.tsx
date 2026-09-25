@@ -1,4 +1,4 @@
-import  ProjectDetail  from "@/components/project/ProjectDetail";
+import ProjectDetail from "@/components/project/ProjectDetail";
 import { ProjectProvider } from "@/context/ProjectContext";
 
 export default async function Page({
@@ -13,7 +13,7 @@ export default async function Page({
 
   return (
     <ProjectProvider slug={slug} projectId={projectId}>
-      <ProjectDetail/>
+      <ProjectDetail />
     </ProjectProvider>
   );
 }

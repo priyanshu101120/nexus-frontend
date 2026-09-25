@@ -3,11 +3,25 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Task } from "@/hooks/type";
+import { MoreVertical, Paperclip } from "lucide-react";
 
-const PRIORITY_STYLES: Record<string, string> = {
-  HIGH: "bg-red-50 text-red-600",
-  MEDIUM: "bg-amber-50 text-amber-600",
-  LOW: "bg-green-50 text-green-600",
+// Image ke tarah priority ke according soft pastel card themes
+const CARD_THEMES: Record<string, { bg: string; text: string; subText: string }> = {
+  HIGH: {
+    bg: "bg-[#fee895]", // Soft Warm Yellow
+    text: "text-[#2e2600]",
+    subText: "text-black/60",
+  },
+  MEDIUM: {
+    bg: "bg-[#c7ddff]", // Soft Pastel Blue
+    text: "text-[#0f2942]",
+    subText: "text-[#1e3a8a]/70",
+  },
+  LOW: {
+    bg: "bg-[#ece8df]", // Warm Cream Neutral
+    text: "text-[#292723]",
+    subText: "text-black/60",
+  },
 };
 
 export function TaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
@@ -19,8 +33,10 @@ export function TaskCard({ task, onClick }: { task: Task; onClick: () => void })
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.4 : 1,
+    opacity: isDragging ? 0.35 : 1,
   };
+
+  const theme = CARD_THEMES[task.priority] || CARD_THEMES.LOW;
 
   return (
     <div
@@ -29,20 +45,75 @@ export function TaskCard({ task, onClick }: { task: Task; onClick: () => void })
       {...attributes}
       {...listeners}
       onClick={onClick}
-      className="mb-2 cursor-grab rounded-xl border border-black/[0.06] bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing"
+      className={`group relative mb-3 cursor-grab rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing ${theme.bg}`}
     >
-      <p className="text-sm font-semibold">{task.title}</p>
+      {/* Top Bar: Category / Priority Tag & Menu */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-black/5 text-[10px]">
+            📌
+          </span>
+          <span className={`text-[10px] font-bold uppercase tracking-wider ${theme.subText}`}>
+            {task.priority} Priority
+          </span>
+        </div>
 
-      <div className="mt-3 flex items-center justify-between">
-        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${PRIORITY_STYLES[task.priority]}`}>
-          {task.priority}
-        </span>
+        <button
+          onClick={(e) => e.stopPropagation()}
+          className="rounded-full p-1 text-black/30 hover:bg-black/5 hover:text-black transition"
+        >
+          <MoreVertical size={14} />
+        </button>
+      </div>
 
-        {task.assignee && (
-          <div className="grid h-6 w-6 place-items-center rounded-full bg-[#6d5dfb] text-[9px] font-bold text-white">
-            {task.assignee.name.slice(0, 2).toUpperCase()}
-          </div>
-        )}
+      {/* Task Title */}
+      <h3 className={`mt-2 text-sm font-bold leading-snug tracking-tight ${theme.text}`}>
+        {task.title}
+      </h3>
+
+      {/* Task Description */}
+      {task.description && (
+        <p className={`mt-1.5 line-clamp-2 text-xs leading-relaxed ${theme.subText}`}>
+          {task.description}
+        </p>
+      )}
+
+      {/* Due Date Chip (Image ke Agenda chip jaise) */}
+      {task.dueDate && (
+        <div className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-black/5 px-2 py-1 text-[10px] font-medium text-black/70">
+          <Paperclip size={11} />
+          <span>{new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+        </div>
+      )}
+
+      {/* Footer: Assignees Stack & Action Pill */}
+      <div className="mt-4 flex items-center justify-between pt-1">
+        {/* User Avatars Stack */}
+        <div className="flex -space-x-1.5 overflow-hidden">
+          {task.assignee ? (
+            <div
+              title={task.assignee.name}
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-[#18181b] text-[9px] font-bold text-white ring-2 ring-white"
+            >
+              {task.assignee.name.slice(0, 2).toUpperCase()}
+            </div>
+          ) : (
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/10 text-[9px] font-medium text-black/40 ring-2 ring-white">
+              --
+            </div>
+          )}
+        </div>
+
+        {/* Action Button Pill */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+          className="rounded-full bg-black/80 px-3 py-1 text-[10px] font-semibold text-white shadow-sm transition hover:bg-black"
+        >
+          Open
+        </button>
       </div>
     </div>
   );

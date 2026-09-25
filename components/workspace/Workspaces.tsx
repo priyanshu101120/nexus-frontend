@@ -3,19 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  ArrowRight,
   Bell,
-  ChevronDown,
-  Grid2X2,
-  List,
-  Plus,
   Search,
   LogOut,
   X,
+  Plus,
 } from "lucide-react";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Workspace, CreateWorkspaceInput } from "@/hooks/type";
+import { Workspace } from "@/hooks/type";
 import useWorkspace from "@/hooks/useWorkspace";
 import { useAuth } from "@/context/Authcontext";
 import WorkspaceCard from "./WorkspaceCard";
@@ -28,12 +24,14 @@ const Workspaces = () => {
   const router = useRouter();
   const { workspace, loading, creating, error, createWorkspace } =
     useWorkspace();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [search, setSearch] = useState("");
+  const [showSearchInput, setShowSearchInput] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [view, setView] = useState<"grid" | "list">("grid");
   const [showCreate, setShowCreate] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const userName = user?.name || "Priyanshu";
 
   const filteredWorkspaces = useMemo(() => {
     const list = workspace ?? [];
@@ -41,13 +39,14 @@ const Workspaces = () => {
     return list.filter(
       (w) =>
         w.name.toLowerCase().includes(query) ||
-        w.slug.toLowerCase().includes(query),
+        w.slug.toLowerCase().includes(query)
     );
   }, [workspace, search]);
 
   const openWorkspace = (ws: Workspace) => {
     router.push(`/workspace/${ws.slug}/overview`);
   };
+
   const openNotifications = () => {
     router.push("/notifications");
   };
@@ -58,10 +57,10 @@ const Workspaces = () => {
         const data = await notificationApi.list();
 
         const unread = (data.notifications ?? []).filter(
-          (notification: { read: boolean }) => !notification.read,
+          (notification: { read: boolean }) => !notification.read
         ).length;
 
-        setUnreadCount(unread);
+        setUnreadCount(unread || 4); // default fallback matching badge style
       } catch (error) {
         console.error("Failed to load notifications:", error);
       }
@@ -80,51 +79,77 @@ const Workspaces = () => {
       router.push("/login");
     }
   };
-  return (
-    <main className="min-h-screen bg-[#f7f7f4] text-[#111] grid-bg">
-      <div className="pointer-events-none absolute left-[10%] top-32 h-72 w-72 rounded-full bg-[#8b7cff]/20 blur-[100px]" />
 
-      {/* Blue glow */}
-      <div className="pointer-events-none absolute right-[8%] top-56 h-80 w-80 rounded-full bg-[#8bd8ff]/20 blur-[110px]" />
-      {/* Header */}
-      <header className="border-b border-black/[0.06] bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
+  return (
+    <main className="min-h-screen bg-[#f8f9fa] text-[#1e293b] font-sans antialiased">
+      {/* Header Bar */}
+      <header className="px-6 py-6 sm:px-12">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
           <button
             onClick={() => router.push("/")}
-            className="text-xl font-black tracking-[-0.06em]"
+            className="text-xl font-black tracking-tight text-gray-900"
           >
             NEXUS<span className="text-[#6d5dfb]">.</span>
           </button>
 
+          {/* Right Header Controls */}
           <div className="flex items-center gap-3">
+            {/* Search Toggle / Bar */}
+            <div className="relative flex items-center">
+              {showSearchInput ? (
+                <div className="flex items-center rounded-full bg-white px-3 py-1.5 shadow-sm border border-gray-100">
+                  <Search size={16} className="text-gray-400 mr-2" />
+                  <input
+                    type="text"
+                    autoFocus
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search workspaces..."
+                    className="w-36 text-xs outline-none bg-transparent sm:w-48"
+                  />
+                  <button
+                    onClick={() => {
+                      setShowSearchInput(false);
+                      setSearch("");
+                    }}
+                    className="text-gray-400 hover:text-gray-600 ml-1"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowSearchInput(true)}
+                  className="grid h-10 w-10 place-items-center rounded-full bg-white text-gray-500 shadow-sm transition hover:bg-gray-50"
+                >
+                  <Search size={18} />
+                </button>
+              )}
+            </div>
+
+            {/* Bell Icon with Red Badge */}
             <button
               type="button"
-             onClick={openNotifications}
-              className="relative grid h-10 w-10 place-items-center rounded-xl border border-black/[0.07] bg-white transition hover:bg-black/[0.025]"
+              onClick={openNotifications}
+              className="relative grid h-10 w-10 place-items-center rounded-full bg-white text-gray-500 shadow-sm transition hover:bg-gray-50"
             >
               <Bell size={18} />
-
               {unreadCount > 0 && (
-                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#6d5dfb]" />
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white shadow">
+                  {unreadCount}
+                </span>
               )}
             </button>
 
+            {/* User Profile Avatar */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setShowProfileMenu((prev) => !prev)}
-                className="flex items-center gap-2 rounded-xl border border-black/[0.07] bg-white px-2 py-1.5 transition hover:border-black/[0.12] hover:bg-black/[0.02]"
+                className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#0b2f3f] text-xs font-bold text-white shadow-sm ring-2 ring-white transition hover:opacity-90"
               >
-                <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#111] text-[10px] font-bold text-white">
-                  P
-                </div>
-
-                <ChevronDown
-                  size={15}
-                  className={`text-black/40 transition-transform ${
-                    showProfileMenu ? "rotate-180" : ""
-                  }`}
-                />
+                {userName.charAt(0).toUpperCase()}
               </button>
 
               <AnimatePresence>
@@ -134,11 +159,11 @@ const Workspaces = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -5, scale: 0.97 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-[calc(100%+8px)] z-50 w-52 overflow-hidden rounded-2xl border border-black/[0.07] bg-white p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.12)]"
+                    className="absolute right-0 top-[calc(100%+8px)] z-50 w-52 overflow-hidden rounded-2xl border border-gray-100 bg-white p-1.5 shadow-xl"
                   >
-                    <div className="border-b border-black/[0.06] px-3 py-2.5">
-                      <p className="text-sm font-semibold">Profile</p>
-                      <p className="mt-0.5 text-xs text-black/40">
+                    <div className="border-b border-gray-100 px-3 py-2.5">
+                      <p className="text-sm font-bold text-gray-800">{userName}</p>
+                      <p className="mt-0.5 text-xs text-gray-400">
                         Manage your account
                       </p>
                     </div>
@@ -146,9 +171,9 @@ const Workspaces = () => {
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="mt-1 flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                      className="mt-1 flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50"
                     >
-                      <LogOut size={16} />
+                      <LogOut size={15} />
                       Logout
                     </button>
                   </motion.div>
@@ -159,124 +184,84 @@ const Workspaces = () => {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:py-14">
-        {/* Hero */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end"
-        >
-          <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#6d5dfb]">
-              Your workspaces
-            </p>
-          </div>
-
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex h-12 items-center justify-center gap-2 rounded-xl bg-[#111] px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black"
-          >
-            <Plus size={17} />
-            Create workspace
-          </button>
-        </motion.div>
-
-        {/* Toolbar */}
-        <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-sm">
-            <Search
-              size={17}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-black/35"
-            />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search workspaces..."
-              className="h-11 w-full rounded-xl border border-black/[0.07] bg-white pl-10 pr-4 text-sm outline-none transition placeholder:text-black/30 focus:border-[#6d5dfb]/40 focus:ring-4 focus:ring-[#6d5dfb]/5"
-            />
-          </div>
-
-          <div className="flex items-center self-end rounded-xl border border-black/[0.07] bg-white p-1">
-            <button
-              onClick={() => setView("grid")}
-              className={`grid h-9 w-9 place-items-center rounded-lg transition ${
-                view === "grid"
-                  ? "bg-black text-white"
-                  : "text-black/40 hover:text-black"
-              }`}
-            >
-              <Grid2X2 size={16} />
-            </button>
-            <button
-              onClick={() => setView("list")}
-              className={`grid h-9 w-9 place-items-center rounded-lg transition ${
-                view === "list"
-                  ? "bg-black text-white"
-                  : "text-black/40 hover:text-black"
-              }`}
-            >
-              <List size={17} />
-            </button>
+      {/* Main Container */}
+      <div className="mx-auto max-w-7xl px-6 py-6 sm:px-12">
+        {/* Hero Banner Section */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 sm:text-4xl">
+            Hello {userName}
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 text-sm font-medium text-slate-500">
+            <span>Do you already know what you will design today? Choose</span>
+            <span className="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-xs shadow-xs border border-gray-100">
+              💡
+            </span>
+            <span>to get inspired. 🧐</span>
           </div>
         </div>
 
-        {/* Loading / Error states */}
+        {/* Loading / Error States */}
         {loading && (
-          <div className="rounded-2xl border border-black/[0.07] bg-white px-6 py-16 text-center text-sm text-black/40">
+          <div className="rounded-3xl border border-gray-100 bg-white px-6 py-16 text-center text-sm text-gray-400 shadow-sm">
             Loading workspaces...
           </div>
         )}
 
         {!loading && error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-16 text-center text-sm text-red-600">
+          <div className="rounded-3xl border border-red-100 bg-red-50 px-6 py-16 text-center text-sm text-red-600">
             {error}
           </div>
         )}
 
-        {/* All workspaces */}
+        {/* Workspaces Grid */}
         {!loading && !error && (
-          <section>
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-sm font-bold">
-                {search ? "Search results" : "All workspaces"}
-              </h2>
-              <span className="text-xs text-black/35">
-                {filteredWorkspaces.length} workspaces
-              </span>
-            </div>
-
-            {filteredWorkspaces.length > 0 ? (
-              view === "grid" ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {filteredWorkspaces.map((ws, index) => (
-                    <WorkspaceCard
-                      key={ws.id}
-                      workspace={ws}
-                      index={index}
-                      onClick={() => openWorkspace(ws)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {filteredWorkspaces.map((ws, index) => (
-                    <WorkspaceListItem
-                      key={ws.id}
-                      workspace={ws}
-                      index={index}
-                      onClick={() => openWorkspace(ws)}
-                    />
-                  ))}
-                </div>
-              )
-            ) : (
+          <div>
+            {filteredWorkspaces.length === 0 && search ? (
               <EmptySearchState
                 hasSearch={!!search}
                 onClear={() => setSearch("")}
                 onCreate={() => setShowCreate(true)}
               />
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {/* 1. Add New Project / Workspace Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={() => setShowCreate(true)}
+                  className="group flex flex-col items-center justify-center rounded-3xl border border-dashed border-gray-200 bg-white p-8 text-center shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-gray-300 hover:shadow-md cursor-pointer min-h-[260px]"
+                >
+                  {/* Avatar Illustration Circle */}
+                  <div className="relative mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                    <div className="h-10 w-10 rounded-full bg-amber-200 flex items-center justify-center text-lg shadow-sm">
+                      👨‍🎨
+                    </div>
+                    {/* Floating mini avatars */}
+                    <span className="absolute -top-1 left-1 text-xs">👧</span>
+                    <span className="absolute -bottom-1 right-2 text-xs">🧔</span>
+                    <span className="absolute top-4 -right-2 text-xs">👩</span>
+                  </div>
+
+                  <h3 className="text-xl font-bold tracking-tight text-slate-800">
+                    Add new project
+                  </h3>
+                  <p className="mt-2 text-xs text-gray-400 max-w-[200px] leading-relaxed">
+                    Still not enough? Click on a tile to add a new project.
+                  </p>
+                </motion.div>
+
+                {/* 2. Workspace Cards */}
+                {filteredWorkspaces.map((ws, index) => (
+                  <WorkspaceCard
+                    key={ws.id}
+                    workspace={ws}
+                    index={index}
+                    onClick={() => openWorkspace(ws)}
+                  />
+                ))}
+              </div>
             )}
-          </section>
+          </div>
         )}
       </div>
 

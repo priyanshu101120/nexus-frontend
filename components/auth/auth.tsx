@@ -1,12 +1,15 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { ArrowLeft, Check, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { Button, Card, Input } from "../ui";
 import { useAuth } from "@/context/Authcontext";
 import { toast } from "sonner";
 import { GoogleLogin } from "@react-oauth/google";
+
+import loginPicture from "@/public/secondloginimage.png";
+import firstloginPicture from "@/public/firstloginimage.png";
 
 type AuthProps = {
   initialMode?: "login" | "register";
@@ -24,6 +27,10 @@ export function Auth({ initialMode = "login", inviteToken }: AuthProps) {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState(false);
+
+  // Next.js static import handling (handles object or direct string URL)
+  const bgImageUrl = typeof loginPicture === "string" ? loginPicture : loginPicture.src;
+  const bgImageUrl2 = typeof firstloginPicture === "string" ? firstloginPicture : firstloginPicture.src;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -100,8 +107,6 @@ export function Auth({ initialMode = "login", inviteToken }: AuthProps) {
     }
   };
 
-  // Switching mode clears sensitive/mode-specific fields and errors —
-  // no route change, same page, same component instance.
   const switchMode = (next: "login" | "register") => {
     setMode(next);
     setErrorMessage("");
@@ -145,249 +150,213 @@ export function Auth({ initialMode = "login", inviteToken }: AuthProps) {
       bar: "bg-emerald-600",
     };
   };
+
   const passwordStrength = getPasswordStrength(password);
 
   return (
-    <main className="min-h-screen bg-[#f7f7f4] p-4 bg-grid">
-      <div className="pointer-events-none absolute left-[10%] top-32 h-72 w-72 rounded-full bg-[#8b7cff]/20 blur-[100px]" />
+    <div
+      className="flex min-h-screen w-full items-center justify-center bg-[#008689] p-4"
+      style={{
+        backgroundImage: `url(${bgImageUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="flex min-h-[600px] w-full max-w-4xl overflow-hidden rounded-[18px] bg-white shadow-[0_30px_80px_rgba(2,6,23,0.45)]">
+        {/* Left Hero Banner with Background Image */}
+        <div
+          className="relative hidden w-1/2 overflow-hidden bg-[#0b2f3f] md:block"
+          style={{
+            backgroundImage: `url(${bgImageUrl2})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          {/* Dark Overlay for Text Readability */}
+          <div className="absolute inset-0 bg-[#041a2b]/55" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_28%),linear-gradient(180deg,transparent_0%,rgba(4,26,43,0.08)_100%)]" />
 
-      {/* Blue glow */}
-      <div className="pointer-events-none absolute right-[8%] top-56 h-80 w-80 rounded-full bg-[#8bd8ff]/20 blur-[110px]" />
-      <div className="mx-auto grid min-h-[calc(100vh-32px)] max-w-7xl overflow-hidden rounded-[34px] border border-black/5 bg-white shadow-soft lg:grid-cols-2">
-        <section className="relative hidden overflow-hidden bg-[#111] p-10 text-white lg:flex lg:flex-col lg:justify-between">
-          <button
-            onClick={() => r.push("/")}
-            className="w-fit text-xl font-black tracking-[-.05em]"
-          >
-            NEXUS<span className="text-[#9b91ff]">.</span>
-          </button>
-          <div className="relative z-10 max-w-lg">
-            <p className="mb-5 text-xs font-bold uppercase tracking-[.2em] text-[#9b91ff]">
-              Your work, connected.
-            </p>
-            <h1 className="text-6xl font-black tracking-[-.05em]">
-              Build momentum.
-              <br />
-              Keep context.
-              <br />
-              <span className="text-[#9b91ff]">Ship together.</span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+            <h1 className="text-4xl font-light tracking-[0.35em] text-white drop-shadow-md">
+              WELCOME
             </h1>
-            <div className="mt-10 space-y-3 text-sm text-white/60">
-              {[
-                "Projects, tasks and people in one place",
-                "Designed for calm, focused collaboration",
-                "Ready for your team's next chapter",
-              ].map((x) => (
-                <div key={x}>
-                  <Check size={16} className="mr-2 inline text-[#9b91ff]" />
-                  {x}
-                </div>
-              ))}
-            </div>
+            <p className="mt-3 text-xs tracking-widest text-white/80 uppercase">
+              Build momentum • Ship together
+            </p>
           </div>
-          <p className="text-xs text-white/30">© 2026 Nexus Studio</p>
-          <div className="absolute -right-24 top-1/4 h-80 w-80 rounded-full bg-[#6D5DFB]/30 blur-[100px]" />
-        </section>
+        </div>
 
-        <section className="flex items-center justify-center p-6 sm:p-12">
-          <div className="w-full max-w-md">
-            <button
-              onClick={() => r.push("/")}
-              className="mb-10 flex items-center gap-2 text-sm text-[#777] lg:hidden"
-            >
-              <ArrowLeft size={16} />
-              Nexus
-            </button>
+        {/* Right Form Section */}
+        <div className="flex w-full flex-col justify-between bg-[#f4f3f0] px-8 py-8 sm:px-10 md:w-1/2 md:px-12">
+          <div className="my-auto w-full max-w-sm">
+            <h2 className="mb-6 text-3xl font-semibold tracking-tight text-[#0f172a]">
+              {mode === "login" ? "Login" : "Sign up"}
+            </h2>
 
-            <div className="mb-8">
-              <p className="text-xs font-bold uppercase tracking-[.18em] text-nexus">
-                Nexus workspace
-              </p>
-              <h2 className="mt-2 text-4xl font-bold tracking-tight">
-                {mode === "login" ? "Welcome back." : "Create your workspace."}
-              </h2>
-              <p className="mt-2 text-sm text-[#777]">
-                {mode === "login"
-                  ? "Pick up where your team left off."
-                  : "Bring projects, tasks and people together."}
-              </p>
-            </div>
+            {errorMessage && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-2.5 text-center text-xs text-red-500">
+                {errorMessage}
+              </div>
+            )}
 
-            <Card className="border-0 bg-transparent shadow-none">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {mode === "register" && (
-                  <label className="block">
-                    <span className="mb-1.5 block text-xs font-semibold">
-                      Name
-                    </span>
-                    <Input
-                      placeholder="Priyanshu"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </label>
-                )}
-
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold">
-                    Email
-                  </span>
-                  <Input
-                    type="email"
-                    placeholder="you@example.com"
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {mode === "register" && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm text-[#0f172a]">Name</label>
+                  <input
+                    type="text"
+                    placeholder="Priyanshu"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="border-b border-gray-300 bg-transparent pb-2 text-sm text-[#0a1128] outline-none transition placeholder:text-gray-400 focus:border-[#0a1128]"
                   />
-                </label>
+                </div>
+              )}
 
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold">
-                    Password
-                  </span>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm text-[#0f172a]">Email</label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="border-b border-gray-300 bg-transparent pb-2 text-sm text-[#0a1128] outline-none transition placeholder:text-gray-400 focus:border-[#0a1128]"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm text-[#0f172a]">Password</label>
+                  {mode === "login" && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toast.info("Password reset flow coming soon.")
+                      }
+                      className="text-[11px] font-medium text-[#0a1128] transition hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <input
+                    type={show ? "text" : "password"}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full border-b border-gray-300 bg-transparent pb-2 text-sm text-[#0a1128] outline-none transition placeholder:text-gray-400 focus:border-[#0a1128]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow(!show)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {show ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {mode === "register" && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm text-[#0f172a]">
+                    Confirm Password
+                  </label>
                   <div className="relative">
-                    <Input
+                    <input
                       type={show ? "text" : "password"}
                       placeholder="••••••••"
                       required
-                      minLength={6}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full border-b border-gray-300 bg-transparent pb-2 text-sm text-[#0a1128] outline-none transition placeholder:text-gray-400 focus:border-[#0a1128]"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShow(!show)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999]"
-                    >
-                      {show ? <EyeOff size={17} /> : <Eye size={17} />}
-                    </button>
                   </div>
-                </label>
-
-                {mode === "register" && (
-                  <label className="block">
-                    <span className="mb-1.5 block text-xs font-semibold">
-                      Confirm password
-                    </span>
-                    <div className="relative">
-                      <Input
-                        type={show ? "text" : "password"}
-                        placeholder="••••••••"
-                        required
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShow(!show)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999]"
-                      >
-                        {show ? <EyeOff size={17} /> : <Eye size={17} />}
-                      </button>
-                    </div>
-                  </label>
-                )}
-
-                {mode === "register" && (
-                  <div className="rounded-xl bg-black/[.025] p-3 text-xs text-[#777]">
-                    <div className="mb-2 flex justify-between">
-                      <span>Password strength</span>
-                      <b className={passwordStrength.text}>
-                        {password ? passwordStrength.label : "Enter password"}
-                      </b>
-                    </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-black/5">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{
-                          width: password
-                            ? passwordStrength.width === "w-1/4"
-                              ? "25%"
-                              : passwordStrength.width === "w-2/4"
-                                ? "50%"
-                                : passwordStrength.width === "w-3/4"
-                                  ? "75%"
-                                  : "100%"
-                            : "0%",
-                        }}
-                        transition={{ duration: 0.25 }}
-                        className={`h-full rounded-full ${passwordStrength.bar}`}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {mode === "login" && (
-                  <div className="flex items-center justify-between text-xs">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        className="rounded border-black/20"
-                      />{" "}
-                      Remember me
-                    </label>
-                    <button type="button" className="font-semibold text-nexus">
-                      Forgot password?
-                    </button>
-                  </div>
-                )}
-
-                {errorMessage && (
-                  <p className="text-xs text-red-500">{errorMessage}</p>
-                )}
-
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3"
-                >
-                  {loading
-                    ? mode === "login"
-                      ? "Login..."
-                      : "Creating account..."
-                    : mode === "login"
-                      ? "Login"
-                      : "Create account"}
-                </Button>
-
-                <div className="flex items-center gap-3 py-2 text-xs text-[#aaa]">
-                  <div className="h-px flex-1 bg-black/10" />
-                  OR
-                  <div className="h-px flex-1 bg-black/10" />
                 </div>
+              )}
 
-                <div className="flex justify-center">
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={() => toast.error("Google login failed.")}
-                    theme="outline"
-                    shape="pill"
-                    width="100%"
-                  />
+              {mode === "register" && password && (
+                <div className="rounded-xl bg-black/[.025] p-3 text-xs text-[#777]">
+                  <div className="mb-1.5 flex justify-between">
+                    <span>Password strength</span>
+                    <b className={passwordStrength.text}>
+                      {passwordStrength.label}
+                    </b>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-black/5">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{
+                        width:
+                          passwordStrength.width === "w-1/4"
+                            ? "25%"
+                            : passwordStrength.width === "w-2/4"
+                              ? "50%"
+                              : passwordStrength.width === "w-3/4"
+                                ? "75%"
+                                : "100%",
+                      }}
+                      transition={{ duration: 0.25 }}
+                      className={`h-full rounded-full ${passwordStrength.bar}`}
+                    />
+                  </div>
                 </div>
-              </form>
-            </Card>
+              )}
 
-            <div className="mt-7 flex items-center justify-center gap-2 text-xs text-[#777]">
-              <ShieldCheck size={15} />
-              Secure by design
-            </div>
-
-            <p className="mt-5 text-center text-sm text-[#777]">
-              {mode === "login" ? "New to Nexus?" : "Already have an account?"}{" "}
               <button
-                onClick={() =>
-                  switchMode(mode === "login" ? "register" : "login")
-                }
-                className="font-bold text-nexus"
+                type="submit"
+                disabled={loading}
+                className="mt-2 rounded-full bg-[#0b1635] py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#101d46] disabled:cursor-not-allowed disabled:bg-[#0b1635]/80"
               >
-                {mode === "login" ? "Create account" : "Login"}
+                {loading
+                  ? mode === "login"
+                    ? "Login..."
+                    : "Creating account..."
+                  : mode === "login"
+                    ? "Login"
+                    : "Sign up"}
               </button>
-            </p>
+
+              <div className="flex items-center gap-3 py-1 text-[11px] text-[#aaa]">
+                <div className="h-px flex-1 bg-black/10" />
+                OR
+                <div className="h-px flex-1 bg-black/10" />
+              </div>
+
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => toast.error("Google login failed.")}
+                  theme="outline"
+                  shape="pill"
+                  width="100%"
+                />
+              </div>
+            </form>
           </div>
-        </section>
+
+          <p className="mt-6 text-center text-xs text-gray-500">
+            {mode === "login"
+              ? "Don't have an account? "
+              : "Already have an account? "}
+            <button
+              type="button"
+              onClick={() =>
+                switchMode(mode === "login" ? "register" : "login")
+              }
+              className="cursor-pointer font-bold text-[#050a1c] hover:underline"
+            >
+              {mode === "login" ? "Sign up" : "Login"}
+            </button>
+          </p>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

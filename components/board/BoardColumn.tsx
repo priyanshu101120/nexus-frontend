@@ -9,12 +9,6 @@ import { TaskCard } from "./TaskCard";
 
 const PRIORITIES: TaskPriority[] = ["LOW", "MEDIUM", "HIGH"];
 
-const PRIORITY_PILL_ACTIVE: Record<TaskPriority, string> = {
-  LOW: "border-green-300 bg-green-50 text-green-600",
-  MEDIUM: "border-amber-300 bg-amber-50 text-amber-600",
-  HIGH: "border-red-300 bg-red-50 text-red-600",
-};
-
 export function BoardColumn({
   column,
   tasks,
@@ -57,40 +51,56 @@ export function BoardColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`flex min-w-[280px] flex-1 flex-col rounded-2xl border border-black/[0.05] bg-[#f7f7f4] p-2 transition ${
-        isOver ? "ring-2 ring-[#6d5dfb]/40" : ""
+      className={`flex min-w-[280px] flex-1 flex-col rounded-3xl bg-[#f2eee5]/70 p-2.5 transition-all duration-200 ${
+        isOver ? "ring-2 ring-black/20" : ""
       }`}
     >
-      <div className="mb-2 flex items-center justify-between px-2 pt-1">
-        <span className="text-[11px] font-bold tracking-widest text-black/45">{column.name}</span>
-        <span className="text-[11px] text-black/30">{tasks.length}</span>
+      {/* Column Header */}
+      <div className="mb-3 flex items-center justify-between px-3 pt-1.5">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-black/70">
+            {column.name}
+          </span>
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black/10 text-[10px] font-bold text-black/60">
+            {tasks.length}
+          </span>
+        </div>
+
+        <button
+          onClick={() => setAdding(true)}
+          className="rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-black transition"
+          title="Add task"
+        >
+          <Plus size={16} />
+        </button>
       </div>
 
+      {/* Task Cards Container */}
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
-        <div className="min-h-[40px] flex-1">
+        <div className="min-h-[80px] flex-1">
           {tasks.map((task) => (
             <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
           ))}
         </div>
       </SortableContext>
 
+      {/* New Task Input Form */}
       {adding ? (
-        <form onSubmit={handleSubmit} className="mt-1 space-y-2 rounded-xl bg-white p-2">
+        <form onSubmit={handleSubmit} className="mt-2 space-y-2 rounded-2xl bg-white/90 p-3 shadow-sm backdrop-blur-sm">
           <input
             autoFocus
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Task title..."
             disabled={submitting}
-            className="w-full rounded-lg border border-black/10 px-2.5 py-2 text-xs outline-none focus:border-[#6d5dfb]/40 disabled:opacity-60"
+            className="w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-xs outline-none focus:border-black disabled:opacity-60"
           />
 
-          {/* Assignee dropdown — any current workspace member */}
           <select
             value={assigneeId}
             onChange={(e) => setAssigneeId(e.target.value)}
             disabled={submitting}
-            className="w-full rounded-lg border border-black/10 bg-white px-2.5 py-2 text-xs outline-none focus:border-[#6d5dfb]/40 disabled:opacity-60"
+            className="w-full rounded-xl border border-black/10 bg-white px-3 py-1.5 text-xs outline-none focus:border-black disabled:opacity-60"
           >
             <option value="">Unassigned</option>
             {members.map((m) => (
@@ -100,7 +110,7 @@ export function BoardColumn({
             ))}
           </select>
 
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 pt-1">
             <div className="flex gap-1">
               {PRIORITIES.map((p) => (
                 <button
@@ -108,10 +118,10 @@ export function BoardColumn({
                   type="button"
                   disabled={submitting}
                   onClick={() => setPriority(p)}
-                  className={`rounded-full border px-2 py-1 text-[10px] font-bold transition ${
+                  className={`rounded-full px-2.5 py-1 text-[9px] font-bold transition ${
                     priority === p
-                      ? PRIORITY_PILL_ACTIVE[p]
-                      : "border-black/10 text-black/35 hover:border-black/20"
+                      ? "bg-black text-white"
+                      : "bg-black/5 text-black/50 hover:bg-black/10"
                   }`}
                 >
                   {p}
@@ -124,8 +134,7 @@ export function BoardColumn({
                 type="button"
                 onClick={closeForm}
                 disabled={submitting}
-                className="grid h-7 w-7 place-items-center rounded-lg text-black/40 transition hover:bg-black/[0.04] hover:text-black disabled:opacity-40"
-                title="Cancel"
+                className="grid h-7 w-7 place-items-center rounded-full text-black/50 hover:bg-black/5"
               >
                 <X size={14} />
               </button>
@@ -133,10 +142,9 @@ export function BoardColumn({
               <button
                 type="submit"
                 disabled={!title.trim() || submitting}
-                className="grid h-7 w-7 place-items-center rounded-lg bg-[#111] text-white transition hover:bg-black disabled:opacity-40"
-                title="Add task"
+                className="grid h-7 w-7 place-items-center rounded-full bg-black text-white hover:bg-black/80 disabled:opacity-40"
               >
-                {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={13} />}
+                {submitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={12} />}
               </button>
             </div>
           </div>
@@ -144,9 +152,9 @@ export function BoardColumn({
       ) : (
         <button
           onClick={() => setAdding(true)}
-          className="mt-1 flex items-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium text-black/40 transition hover:bg-black/[0.03] hover:text-black"
+          className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-black/15 py-2.5 text-xs font-semibold text-black/50 transition hover:border-black/30 hover:bg-black/5 hover:text-black"
         >
-          <Plus size={14} /> Add task
+          <Plus size={14} /> Add Task
         </button>
       )}
     </div>
