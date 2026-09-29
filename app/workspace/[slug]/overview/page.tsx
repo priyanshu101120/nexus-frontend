@@ -8,6 +8,8 @@ import {
   ArrowUpRight,
   Sparkles,
   Plus,
+  ArrowRight,
+  ArrowLeft,
 } from "lucide-react";
 
 import { useWorkspaceContext } from "@/context/WorkspaceContext";
@@ -36,9 +38,16 @@ export default function WorkspaceOverviewPage() {
       <div className="mx-auto max-w-7xl space-y-6">
         {/* HEADER */}
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#6d5dfb]">
+          <button
+            onClick={() => router.push("/workspace")}
+            className="mt-6 inline-flex items-center gap-2 rounded-lg text-[#6d5dfb] px-4 py-2 text-sm font-medium transition hover:opacity-90"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#6d5dfb]">
             Workspace
-          </p>
+          </span>
+          </button>
+          
           <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">
             Good to see you, {userName}.
           </h1>
@@ -67,7 +76,9 @@ export default function WorkspaceOverviewPage() {
                 Project progress
               </h2>
               <button
-                onClick={() => router.push(`/workspace/${workspace.slug}/projects`)}
+                onClick={() =>
+                  router.push(`/workspace/${workspace.slug}/projects`)
+                }
                 className="text-xs font-bold text-[#6d5dfb] hover:underline"
               >
                 View all →
@@ -95,7 +106,9 @@ export default function WorkspaceOverviewPage() {
                   Create your first project to see progress here.
                 </p>
                 <button
-                  onClick={() => router.push(`/workspace/${workspace.slug}/projects`)}
+                  onClick={() =>
+                    router.push(`/workspace/${workspace.slug}/projects`)
+                  }
                   className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#6d5dfb] px-4 py-2 text-xs font-bold text-white shadow-sm"
                 >
                   <Plus size={14} /> Create project
@@ -104,14 +117,23 @@ export default function WorkspaceOverviewPage() {
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 {projects.map((p, idx) => {
-                  const fallbackColors = ["#ec4899", "#6d5dfb", "#3b82f6", "#f97316", "#10b981"];
-                  const color = p.color || fallbackColors[idx % fallbackColors.length];
+                  const fallbackColors = [
+                    "#ec4899",
+                    "#6d5dfb",
+                    "#3b82f6",
+                    "#f97316",
+                    "#10b981",
+                  ];
+                  const color =
+                    p.color || fallbackColors[idx % fallbackColors.length];
 
                   return (
                     <div
                       key={p.id}
                       onClick={() =>
-                        router.push(`/workspace/${workspace.slug}/projects/${p.id}`)
+                        router.push(
+                          `/workspace/${workspace.slug}/projects/${p.id}`,
+                        )
                       }
                       className="group cursor-pointer rounded-[28px] border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                     >
@@ -153,7 +175,10 @@ export default function WorkspaceOverviewPage() {
                         </span>
                         <div className="flex -space-x-1.5">
                           {members.slice(0, 3).map((m) => (
-                            <div key={m.id} className="ring-2 ring-white rounded-full">
+                            <div
+                              key={m.id}
+                              className="ring-2 ring-white rounded-full"
+                            >
                               <Avatar name={m.user.name} size="sm" />
                             </div>
                           ))}
@@ -176,7 +201,14 @@ export default function WorkspaceOverviewPage() {
 
                 <div className="relative my-6 flex items-center justify-center">
                   <svg className="h-36 w-36 -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="40" stroke="#f1f5f9" strokeWidth="7" fill="none" />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      stroke="#f1f5f9"
+                      strokeWidth="7"
+                      fill="none"
+                    />
                     <circle
                       cx="50"
                       cy="50"
@@ -194,7 +226,9 @@ export default function WorkspaceOverviewPage() {
                     <span className="text-2xl font-black text-slate-900">
                       {overallProgress}%
                     </span>
-                    <span className="text-[10px] font-bold text-slate-400">Complete</span>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      Complete
+                    </span>
                   </div>
                 </div>
               </div>
@@ -202,10 +236,14 @@ export default function WorkspaceOverviewPage() {
               <div className="grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
                 <div className="rounded-2xl bg-slate-50 p-3 border border-slate-100/60">
                   <p className="text-[10px] font-bold text-slate-400">DONE</p>
-                  <p className="mt-1 text-lg font-black text-slate-800">{doneTasks}</p>
+                  <p className="mt-1 text-lg font-black text-slate-800">
+                    {doneTasks}
+                  </p>
                 </div>
                 <div className="rounded-2xl bg-purple-50/50 p-3 border border-purple-100/50">
-                  <p className="text-[10px] font-bold text-purple-600">REMAINING</p>
+                  <p className="text-[10px] font-bold text-purple-600">
+                    REMAINING
+                  </p>
                   <p className="mt-1 text-lg font-black text-[#6d5dfb]">
                     {totalTasks - doneTasks}
                   </p>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Bell, X } from "lucide-react";
+import { Check, Bell, X, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { notificationApi, invitationApi } from "@/lib/api";
 import type { Notification } from "@/hooks/type";
@@ -45,7 +45,6 @@ export default function NotificationsPage() {
       setActionLoading(notification.id);
 
       await invitationApi.accept(token);
-
       await notificationApi.markAsRead(notification.id);
 
       toast.success("Invitation accepted");
@@ -54,17 +53,10 @@ export default function NotificationsPage() {
         prev.filter((item) => item.id !== notification.id),
       );
 
-      const workspaceSlug =
-        notification.invitation?.workspace.slug;
-
-      if (workspaceSlug) {
-        router.push(`/workspace/${workspaceSlug}/overview`);
-      }
+      router.push("/workspace");
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to accept invitation";
+        error instanceof Error ? error.message : "Failed to accept invitation";
 
       toast.error(message);
     } finally {
@@ -78,9 +70,7 @@ export default function NotificationsPage() {
 
       setNotifications((prev) =>
         prev.map((item) =>
-          item.id === notification.id
-            ? { ...item, read: true }
-            : item,
+          item.id === notification.id ? { ...item, read: true } : item,
         ),
       );
     } catch {
@@ -91,9 +81,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="p-6">
-        <p className="text-sm text-black/40">
-          Loading notifications...
-        </p>
+        <p className="text-sm text-black/40">Loading notifications...</p>
       </div>
     );
   }
@@ -101,9 +89,7 @@ export default function NotificationsPage() {
   return (
     <div className="mx-auto max-w-4xl p-6">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold">
-          Notifications
-        </h1>
+        <h1 className="text-2xl font-semibold">Notifications</h1>
 
         <p className="mt-1 text-sm text-black/45">
           Stay updated with your workspace activity.
@@ -116,13 +102,19 @@ export default function NotificationsPage() {
             <Bell className="h-6 w-6 text-black/40" />
           </div>
 
-          <h2 className="font-medium">
-            No notifications
-          </h2>
+          <h2 className="font-medium">You're all caught up</h2>
 
           <p className="mt-1 text-sm text-black/40">
-            You're all caught up.
+            You don't have any new notifications.
           </p>
+
+          <button
+            onClick={() => router.push("/workspace")}
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#6d5dfb] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+          >
+            Go to Workspace
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       ) : (
         <div className="space-y-3">
@@ -138,7 +130,8 @@ export default function NotificationsPage() {
                     : "border-[#6d5dfb]/20 bg-[#6d5dfb]/[0.03]"
                 }`}
               >
-                <div className="flex gap-4">
+                {/* TOP ROW: icon + content + arrow */}
+                <div className="flex items-start gap-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#6d5dfb]/10">
                     <Bell className="h-5 w-5 text-[#6d5dfb]" />
                   </div>
@@ -149,57 +142,63 @@ export default function NotificationsPage() {
                     </p>
 
                     <p className="mt-1 text-xs text-black/40">
-                      {new Date(
-                        notification.createdAt,
-                      ).toLocaleString()}
+                      {new Date(notification.createdAt).toLocaleString()}
                     </p>
+                  </div>
 
+                  {/* Arrow → Workspace : always visible, fixed size */}
+                  <button
+                    onClick={() => router.push("/workspace")}
+                    title="Go to Workspace"
+                    aria-label="Go to Workspace"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#6d5dfb] text-white transition hover:opacity-90"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* BOTTOM ROW: invitation actions + mark read */}
+                {((notification.type === "INVITATION" &&
+                  invitation &&
+                  !invitation.accepted) ||
+                  !notification.read) && (
+                  <div className="mt-4 flex flex-wrap items-center gap-2 pl-14">
                     {notification.type === "INVITATION" &&
                       invitation &&
                       !invitation.accepted && (
-                        <div className="mt-4 flex flex-wrap gap-2">
+                        <>
                           <button
-                            onClick={() =>
-                              handleAccept(notification)
-                            }
-                            disabled={
-                              actionLoading === notification.id
-                            }
+                            onClick={() => handleAccept(notification)}
+                            disabled={actionLoading === notification.id}
                             className="inline-flex items-center gap-2 rounded-lg bg-[#6d5dfb] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
                           >
                             <Check className="h-4 w-4" />
-
                             {actionLoading === notification.id
                               ? "Accepting..."
                               : "Accept"}
                           </button>
 
                           <button
-                            onClick={() =>
-                              handleRead(notification)
-                            }
-                            disabled={
-                              actionLoading === notification.id
-                            }
+                            onClick={() => handleRead(notification)}
+                            disabled={actionLoading === notification.id}
                             className="inline-flex items-center gap-2 rounded-lg border border-black/10 px-4 py-2 text-sm font-medium transition hover:bg-black/[0.03]"
                           >
                             <X className="h-4 w-4" />
-
                             Decline
                           </button>
-                        </div>
+                        </>
                       )}
-                  </div>
 
-                  {!notification.read && (
-                    <button
-                      onClick={() => handleRead(notification)}
-                      className="text-xs text-black/40 hover:text-black"
-                    >
-                      Mark read
-                    </button>
-                  )}
-                </div>
+                    {!notification.read && (
+                      <button
+                        onClick={() => handleRead(notification)}
+                        className="ml-auto whitespace-nowrap text-xs text-black/40 hover:text-black"
+                      >
+                        Mark read
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}

@@ -120,6 +120,7 @@ const Workspaces = () => {
               ) : (
                 <button
                   type="button"
+                  
                   onClick={() => setShowSearchInput(true)}
                   className="grid h-10 w-10 place-items-center rounded-full bg-white text-gray-500 shadow-sm transition hover:bg-gray-50"
                 >
@@ -131,7 +132,7 @@ const Workspaces = () => {
             {/* Bell Icon with Red Badge */}
             <button
               type="button"
-              onClick={openNotifications}
+              onClick={() => router.push("/notifications")}
               className="relative grid h-10 w-10 place-items-center rounded-full bg-white text-gray-500 shadow-sm transition hover:bg-gray-50"
             >
               <Bell size={18} />

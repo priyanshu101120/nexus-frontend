@@ -312,7 +312,7 @@ export function Auth({ initialMode = "login", inviteToken }: AuthProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-2 rounded-full bg-[#0b1635] py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#101d46] disabled:cursor-not-allowed disabled:bg-[#0b1635]/80"
+                className="mt-2 rounded-full bg-[#6d5dfb] py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#4834fa] disabled:cursor-not-allowed disabled:bg-[#6d5dfb]/80"
               >
                 {loading
                   ? mode === "login"
