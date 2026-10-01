@@ -40,6 +40,17 @@ function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const { workspace, loading, error } = useWorkspaceContext();
   const [collapsed, setCollapsed] = useState(false);
 
+
+   const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      router.push("/login");
+    }
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen bg-[#f7f7f4] p-8">
@@ -188,7 +199,7 @@ function WorkspaceShell({ children }: { children: React.ReactNode }) {
           ))}
 
           <button
-            onClick={logout}
+            onClick={handleLogout}
             title={collapsed ? "Log out" : undefined}
             className={`mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/55 transition hover:bg-white/[0.06] hover:text-white ${
               collapsed ? "justify-center" : ""

@@ -67,6 +67,7 @@ export interface LoginInput {
 export interface AuthResponse {
   message: string;
   user: SafeUser;
+  accessToken: string;
 }
 
 // ── Workspace ────────────────────────────────────────────

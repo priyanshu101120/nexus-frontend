@@ -20,18 +20,21 @@ import EmptySearchState from "./EmptySearchState";
 import CreateWorkspaceModal from "./CreateWorkspaceModal";
 import { notificationApi } from "@/lib/api";
 
+
 const Workspaces = () => {
   const router = useRouter();
   const { workspace, loading, creating, error, createWorkspace } =
     useWorkspace();
+    
   const { user, logout } = useAuth();
   const [search, setSearch] = useState("");
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  
 
-  const userName = user?.name || "Priyanshu";
+  const userName = user?.name || user?.email?.split("@")[0] || "User";
 
   const filteredWorkspaces = useMemo(() => {
     const list = workspace ?? [];
@@ -60,7 +63,7 @@ const Workspaces = () => {
           (notification: { read: boolean }) => !notification.read
         ).length;
 
-        setUnreadCount(unread || 4); // default fallback matching badge style
+        setUnreadCount(unread || 0); // default fallback matching badge style
       } catch (error) {
         console.error("Failed to load notifications:", error);
       }

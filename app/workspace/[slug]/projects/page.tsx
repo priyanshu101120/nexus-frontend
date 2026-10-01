@@ -16,36 +16,19 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useWorkspaceContext } from "@/context/WorkspaceContext";
-import { projectApi } from "@/lib/api";
-import { Project, CreateProjectInput } from "@/hooks/type";
+import { CreateProjectInput } from "@/hooks/type";
+import useProject from "@/hooks/useProject";
+import { Avatar } from "@/components/ui";
 
 export default function ProjectsPage() {
   const { workspace } = useWorkspaceContext();
   const router = useRouter();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
 
-  const loadProjects = async () => {
-    if (!workspace) return;
-    try {
-      setLoading(true);
-      const data = await projectApi.list(workspace.slug);
-      setProjects(data.projects ?? []);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadProjects();
-  }, [workspace]);
+  const { projects, loading, createProject } = useProject();
 
   const handleCreate = async (payload: CreateProjectInput) => {
-    if (!workspace) return null;
-    const data = await projectApi.create(workspace.slug, payload);
-    setProjects((prev) => [data.project, ...prev]);
-    return data;
+    return await createProject(payload);
   };
 
   if (!workspace) return null;
@@ -53,11 +36,13 @@ export default function ProjectsPage() {
   return (
     <div className="-m-6 min-h-screen bg-[#f4f5f9] p-6 lg:p-8 font-sans text-slate-800">
       <div className="mx-auto max-w-7xl space-y-6">
-        
         {/* TOP NAVBAR / HEADER CONTROL BAR */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <Search
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              size={16}
+            />
             <input
               type="text"
               placeholder="Search project here..."
@@ -66,7 +51,7 @@ export default function ProjectsPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-600 shadow-sm transition hover:bg-slate-50">
+            <button onClick={()=>{router.push('/notifications')}} className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-600 shadow-sm transition hover:bg-slate-50">
               <Bell size={18} />
               <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-amber-500" />
             </button>
@@ -86,7 +71,6 @@ export default function ProjectsPage() {
 
         {/* MAIN TWO COLUMN LAYOUT (Projects + Right Sidebar Widget) */}
         <div className="grid gap-6 lg:grid-cols-12">
-          
           {/* LEFT 8 COLUMNS: Projects Grid */}
           <div className="lg:col-span-8 space-y-6">
             <div className="flex items-center justify-between">
@@ -110,7 +94,10 @@ export default function ProjectsPage() {
             {loading ? (
               <div className="grid gap-5 sm:grid-cols-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-44 animate-pulse rounded-[28px] bg-white border border-slate-100" />
+                  <div
+                    key={i}
+                    className="h-44 animate-pulse rounded-[28px] bg-white border border-slate-100"
+                  />
                 ))}
               </div>
             ) : projects.length === 0 ? (
@@ -118,9 +105,12 @@ export default function ProjectsPage() {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-[#6d5dfb]">
                   <Sparkles size={24} />
                 </div>
-                <h3 className="mt-4 font-bold text-slate-900">No projects yet</h3>
+                <h3 className="mt-4 font-bold text-slate-900">
+                  No projects yet
+                </h3>
                 <p className="mx-auto mt-1 max-w-sm text-xs font-medium text-slate-400">
-                  Create your first project to start organizing tasks on a board.
+                  Create your first project to start organizing tasks on a
+                  board.
                 </p>
                 <button
                   onClick={() => setShowCreate(true)}
@@ -132,13 +122,24 @@ export default function ProjectsPage() {
             ) : (
               <div className="grid gap-5 sm:grid-cols-2">
                 {projects.map((p, idx) => {
-                  const fallbackColors = ["#ec4899", "#6d5dfb", "#3b82f6", "#f97316", "#10b981"];
-                  const color = p.color || fallbackColors[idx % fallbackColors.length];
+                  const fallbackColors = [
+                    "#ec4899",
+                    "#6d5dfb",
+                    "#3b82f6",
+                    "#f97316",
+                    "#10b981",
+                  ];
+                  const color =
+                    p.color || fallbackColors[idx % fallbackColors.length];
 
                   return (
                     <div
                       key={p.id}
-                      onClick={() => router.push(`/workspace/${workspace.slug}/projects/${p.id}`)}
+                      onClick={() =>
+                        router.push(
+                          `/workspace/${workspace.slug}/projects/${p.id}`,
+                        )
+                      }
                       className="group relative cursor-pointer flex flex-col justify-between rounded-[28px] bg-white p-6 shadow-sm border border-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
                     >
                       <div>
@@ -180,16 +181,24 @@ export default function ProjectsPage() {
 
                       <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-400">
                         <span className="group-hover:text-slate-800 transition flex items-center gap-1">
-                          Open board <ArrowRight size={14} className="transition group-hover:translate-x-1 text-[#6d5dfb]" />
+                          Open board{" "}
+                          <ArrowRight
+                            size={14}
+                            className="transition group-hover:translate-x-1 text-[#6d5dfb]"
+                          />
                         </span>
 
                         {/* Dummy Team Avatars Stack */}
                         <div className="flex -space-x-1.5 overflow-hidden">
-                          <div className="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-purple-100 text-[9px] font-extrabold text-purple-700 flex items-center justify-center">
-                            P
-                          </div>
-                          <div className="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-blue-100 text-[9px] font-extrabold text-blue-700 flex items-center justify-center">
-                            W
+                          <div className="flex -space-x-1.5">
+                            {p.assignees.slice(0, 3).map((assignee) => (
+                              <div
+                                key={assignee.id}
+                                className="rounded-full ring-2 ring-white"
+                              >
+                                <Avatar name={assignee.name} size="sm" />
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -203,13 +212,17 @@ export default function ProjectsPage() {
           {/* RIGHT 4 COLUMNS: Total Project Widget */}
           <div className="lg:col-span-4 space-y-6">
             <div className="rounded-[32px] bg-white p-6 shadow-sm border border-slate-100 flex flex-col justify-between h-full space-y-6">
-              
               <div className="text-center">
-                <h2 className="text-base font-extrabold text-slate-900">Total Project</h2>
-                
+                <h2 className="text-base font-extrabold text-slate-900">
+                  Total Project
+                </h2>
+
                 {/* Circle Progress Gauge Chart */}
                 <div className="relative my-6 flex items-center justify-center">
-                  <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 100 100">
+                  <svg
+                    className="w-40 h-40 transform -rotate-90"
+                    viewBox="0 0 100 100"
+                  >
                     <circle
                       cx="50"
                       cy="50"
@@ -226,7 +239,9 @@ export default function ProjectsPage() {
                       stroke="#6d5dfb"
                       strokeWidth="6"
                       strokeDasharray="251.2"
-                      strokeDashoffset={251.2 * (1 - (projects.length > 0 ? 0.75 : 0))}
+                      strokeDashoffset={
+                        251.2 * (1 - (projects.length > 0 ? 0.75 : 0))
+                      }
                       strokeLinecap="round"
                       fill="none"
                       className="transition-all duration-1000"
@@ -238,7 +253,9 @@ export default function ProjectsPage() {
                       stroke="#f97316"
                       strokeWidth="5"
                       strokeDasharray="194.7"
-                      strokeDashoffset={194.7 * (1 - (projects.length > 0 ? 0.5 : 0))}
+                      strokeDashoffset={
+                        194.7 * (1 - (projects.length > 0 ? 0.5 : 0))
+                      }
                       strokeLinecap="round"
                       fill="none"
                       className="transition-all duration-1000"
@@ -259,13 +276,24 @@ export default function ProjectsPage() {
               {/* Quick Project List Widget */}
               <div className="space-y-2 pt-4 border-t border-slate-100">
                 {projects.slice(0, 5).map((proj, idx) => {
-                  const fallbackColors = ["#3b82f6", "#ec4899", "#6d5dfb", "#f97316", "#10b981"];
-                  const dotColor = proj.color || fallbackColors[idx % fallbackColors.length];
+                  const fallbackColors = [
+                    "#3b82f6",
+                    "#ec4899",
+                    "#6d5dfb",
+                    "#f97316",
+                    "#10b981",
+                  ];
+                  const dotColor =
+                    proj.color || fallbackColors[idx % fallbackColors.length];
 
                   return (
                     <div
                       key={proj.id}
-                      onClick={() => router.push(`/workspace/${workspace.slug}/projects/${proj.id}`)}
+                      onClick={() =>
+                        router.push(
+                          `/workspace/${workspace.slug}/projects/${proj.id}`,
+                        )
+                      }
                       className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-slate-50 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3">
@@ -287,18 +315,18 @@ export default function ProjectsPage() {
                   );
                 })}
               </div>
-
             </div>
           </div>
-
         </div>
-
       </div>
 
       {/* CREATE PROJECT MODAL */}
       <AnimatePresence>
         {showCreate && (
-          <CreateProjectModal onCreate={handleCreate} onClose={() => setShowCreate(false)} />
+          <CreateProjectModal
+            onCreate={handleCreate}
+            onClose={() => setShowCreate(false)}
+          />
         )}
       </AnimatePresence>
     </div>
@@ -323,7 +351,10 @@ function CreateProjectModal({
     try {
       setCreating(true);
       setError(null);
-      await onCreate({ name: name.trim(), description: description.trim() || undefined });
+      await onCreate({
+        name: name.trim(),
+        description: description.trim() || undefined,
+      });
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create project");
@@ -348,19 +379,26 @@ function CreateProjectModal({
       >
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-black text-slate-900">Create New Project</h2>
+            <h2 className="text-lg font-black text-slate-900">
+              Create New Project
+            </h2>
             <p className="text-xs font-semibold text-slate-400 mt-0.5">
               Organize your tasks and board workflow
             </p>
           </div>
-          <button onClick={onClose} className="rounded-xl p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition">
+          <button
+            onClick={onClose}
+            className="rounded-xl p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+          >
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <label className="block">
-            <span className="mb-1.5 block text-xs font-bold text-slate-700">Project name</span>
+            <span className="mb-1.5 block text-xs font-bold text-slate-700">
+              Project name
+            </span>
             <input
               autoFocus
               value={name}
@@ -371,7 +409,9 @@ function CreateProjectModal({
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block text-xs font-bold text-slate-700">Description (optional)</span>
+            <span className="mb-1.5 block text-xs font-bold text-slate-700">
+              Description (optional)
+            </span>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -381,7 +421,9 @@ function CreateProjectModal({
             />
           </label>
 
-          {error && <p className="text-xs font-semibold text-rose-500">{error}</p>}
+          {error && (
+            <p className="text-xs font-semibold text-rose-500">{error}</p>
+          )}
 
           <div className="pt-2">
             <button
