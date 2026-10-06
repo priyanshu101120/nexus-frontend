@@ -181,11 +181,11 @@ export default function NotificationsPage() {
             </div>
 
             <h2 className="font-medium">
-              You're all caught up
+              {"You're all caught up"}
             </h2>
 
             <p className="mt-1 text-sm text-black/40">
-              You don't have any new notifications.
+              {"You don't have any new notifications."}
             </p>
           </div>
         )}

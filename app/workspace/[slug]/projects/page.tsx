@@ -79,7 +79,7 @@ export default function ProjectsPage() {
                   My Projects
                 </h1>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">
-                  {workspace.name}'s active workspace repositories
+                  {workspace.name}&apos;s active workspace repositories
                 </p>
               </div>
 

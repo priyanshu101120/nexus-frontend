@@ -565,10 +565,10 @@ function FinalCTA() {
         className="relative mx-auto max-w-2xl text-center"
       >
         <h2 className="text-3xl font-black tracking-[-0.03em] sm:text-4xl">
-          Bring your team's work into one place
+          {"Bring your team's work into one place"}
         </h2>
         <p className="mx-auto mt-3 max-w-md text-black/50">
-          Start free. Invite your team when you're ready.
+          {"Start free. Invite your team when you're ready."}
         </p>
         <button
           onClick={() => router.push("/login")}
@@ -601,7 +601,7 @@ function Footer() {
               NEXUS<span className="text-[#9b91ff]">.</span>
             </div>
             <p className="mt-3 max-w-xs text-sm text-white/50">
-              One calm place for your team's workspaces, boards and tasks.
+              {"One calm place for your team's workspaces, boards and tasks."}
             </p>
           </div>
 
