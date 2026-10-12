@@ -1,22 +1,19 @@
+
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { ArrowRight, Zap } from "lucide-react";
+import { useState, type KeyboardEvent } from "react";
 import { motion } from "motion/react";
-import {
-  ArrowRight,
-  Kanban,
-  Users,
-  MessageSquare,
-  ShieldCheck,
-  Zap,
-  GitBranch,
-  Plus,
-  ChevronDown,
-  Layers,
-  UserPlus,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
 
+type FlowKey = "review" | "request" | "renew";
+
+const navigation = [
+  { label: "Platform", href: "#platform" },
+  { label: "Solutions", href: "#solutions" },
+  { label: "Resources", href: "#resources" },
+  { label: "Company", href: "#company" },
+];
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0 },
@@ -27,86 +24,245 @@ const stagger = {
   show: { transition: { staggerChildren: 0.12 } },
 };
 
-export function Landing() {
-  return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f7f7f4] text-[#111] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-      {/* Import Editorial Serif Fonts matching the reference image */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-        .font-hero-serif {
-          font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
-        }
-      `}</style>
+const flowOrder: FlowKey[] = ["review", "request", "renew"];
 
-      <NavBar />
-      <Hero />
-      <MockBoardPreview />
-      <HowItWorks />
-      <FeatureGrid />
-      <ValueStrip />
-      <GetStartedSteps />
-      <FAQ />
-      <FinalCTA />
-      <Footer />
-    </main>
+const flowContent = {
+  review: {
+    label: "01 / Plan",
+    title: "Turn scattered ideas into clear plans.",
+    body: "Organize projects, define priorities, and give every team member a clear understanding of what needs to happen next.",
+    items: [
+      "Create projects with clear ownership",
+      "Break goals into actionable tasks",
+      "Track priorities and deadlines",
+    ],
+    prompt: "What should our team prioritize this week?",
+    answer:
+      "Review overdue tasks, unblock high-priority work, and align upcoming deadlines.",
+  },
+  request: {
+    label: "02 / Collaborate",
+    title: "Keep your entire team moving together.",
+    body: "Bring tasks, assignments, comments, and project updates into one shared workspace so everyone stays aligned.",
+    items: [
+      "Assign tasks to the right teammates",
+      "Share context through task comments",
+      "Keep everyone updated with notifications",
+    ],
+    prompt: "What is blocking our current sprint?",
+    answer:
+      "Review blocked tasks, follow up with their owners, and coordinate the next steps.",
+  },
+  renew: {
+    label: "03 / Deliver",
+    title: "Turn progress into meaningful outcomes.",
+    body: "Monitor project progress, identify unfinished work, and help your team deliver with greater clarity and accountability.",
+    items: [
+      "Track task completion across boards",
+      "Monitor project progress",
+      "Review activity and upcoming deadlines",
+    ],
+    prompt: "Which projects need attention?",
+    answer:
+      "Review project progress, overdue tasks, and assignments that need immediate attention.",
+  },
+} as const;
+
+const capabilities = [
+  {
+    number: "01",
+    title: "Projects and Kanban boards",
+    text: "Organize work into projects, manage tasks across workflow stages, and keep priorities visible to everyone on your team.",
+  },
+  {
+    number: "02",
+    title: "Team collaboration and ownership",
+    text: "Bring teammates, task assignments, comments, and workspace permissions together in one collaborative environment.",
+  },
+  {
+    number: "03",
+    title: "AI-powered productivity",
+    text: "Make project information easier to understand, organize tasks, and explore AI-assisted workflows to improve everyday productivity.",
+  },
+];
+
+const faqs = [
+  {
+    question: "What is Nexus?",
+    answer:
+      "Nexus is a team collaboration and project management platform designed to help teams organize work, manage projects, assign tasks, and track progress from a shared workspace.",
+  },
+  {
+    question: "How does Nexus organize projects?",
+    answer:
+      "Nexus organizes workspaces, projects, boards, and tasks in a structured hierarchy. Teams can manage tasks across workflow columns, assign ownership, and monitor project progress.",
+  },
+  {
+    question: "Can teams collaborate on tasks?",
+    answer:
+      "Nexus brings task assignments, comments, team members, project activity, and notifications together to help teams coordinate their work and stay informed about important updates.",
+  },
+  {
+    question: "Does Nexus support AI-powered workflows?",
+    answer:
+      "Nexus is designed to bring AI-assisted productivity into project management. Available AI capabilities depend on the features implemented and configured in your application.",
+  },
+];
+
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" className="icon-arrow">
+      <path
+        d="M2 8h11M9 3l5 5-5 5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
-/* ============================= NAV (Fully Transparent) ============================= */
-
-function NavBar() {
-  const router = useRouter();
+function MarkIcon() {
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-transparent"
-    >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <div className="text-lg font-black tracking-[-.05em]">
-          NEXUS<span className="text-[#6d5dfb]">.</span>
+    <svg viewBox="0 0 34 34" aria-hidden="true" className="brand-mark">
+      <path d="M4 5h11v11H4zM19 5h11v11H19zM4 19h11v11H4zM19 19h11v11H19z" />
+    </svg>
+  );
+}
+
+function SparkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="spark-icon">
+      <path
+        d="M12 2l1.8 7.1L21 11l-7.2 1.9L12 20l-1.8-7.1L3 11l7.2-1.9L12 2z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function scrollToSection(id: string) {
+  document
+    .getElementById(id)
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+export default function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeFlow, setActiveFlow] = useState<FlowKey>("review");
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  const router = useRouter();
+
+  const activeContent = flowContent[activeFlow];
+   const bgImg = "/cfbef7ee6088cac3e2e6c01cfe57bfed.png";
+
+  const handleFlowKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    current: FlowKey,
+  ) => {
+    const index = flowOrder.indexOf(current);
+    let nextIndex = index;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown")
+      nextIndex = (index + 1) % flowOrder.length;
+
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp")
+      nextIndex = (index - 1 + flowOrder.length) % flowOrder.length;
+
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = flowOrder.length - 1;
+
+    if (nextIndex !== index) {
+      event.preventDefault();
+
+      const nextFlow = flowOrder[nextIndex];
+
+      setActiveFlow(nextFlow);
+      document.getElementById(`flow-tab-${nextFlow}`)?.focus();
+    }
+  };
+
+  return (
+    <div className="site-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
+
+      <header className="site-header">
+        <div className="header-inner">
+          <a className="brand" href="#top" aria-label="Nexus home">
+            <MarkIcon />
+            <span>NEXUS.</span>
+          </a>
+
+          <nav className="desktop-nav" aria-label="Primary navigation">
+            {navigation.map((item) => (
+              <a key={item.label} href={item.href}>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="header-actions">
+            <a className="login-link" href="#contact">
+              Log in
+            </a>
+
+            <button
+              className="button button-small"
+              type="button"
+              onClick={() => scrollToSection("contact")}
+            >
+              Get started <ArrowIcon />
+            </button>
+
+            <button
+              className="menu-toggle"
+              type="button"
+              aria-label={
+                menuOpen ? "Close navigation menu" : "Open navigation menu"
+              }
+              aria-expanded={menuOpen}
+              aria-controls="mobile-navigation"
+              onClick={() => setMenuOpen((value) => !value)}
+            >
+              <span />
+              <span />
+            </button>
+          </div>
         </div>
 
-        <nav className="hidden items-center gap-8 text-sm font-medium text-black/70 md:flex">
-          <a href="#how-it-works" className="transition hover:text-black">
-            How it works
-          </a>
-          <a href="#features" className="transition hover:text-black">
-            Features
-          </a>
-          <a href="#faq" className="transition hover:text-black">
-            FAQ
+        <nav
+          id="mobile-navigation"
+          className={`mobile-nav ${menuOpen ? "is-open" : ""}`}
+          aria-label="Mobile navigation"
+        >
+          {navigation.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              onClick={() => setMenuOpen(false)}
+            >
+              {item.label}
+              <ArrowIcon />
+            </a>
+          ))}
+
+          <a href="#contact" onClick={() => setMenuOpen(false)}>
+            Log in
+            <ArrowIcon />
           </a>
         </nav>
+      </header>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => router.push("/login")}
-            className="hidden rounded-xl px-4 py-2 text-sm font-semibold text-black/70 transition hover:bg-black/5 sm:block"
-          >
-            Log in
-          </button>
-          <button
-            onClick={() => router.push("/register")}
-            className="flex items-center gap-1.5 rounded-xl bg-[#6d5dfb] px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#101d46]"
-          >
-            Get started <ArrowRight size={14} />
-          </button>
-        </div>
-      </div>
-    </motion.header>
-  );
-}
-
-/* ============================= HERO (Editorial Typography) ============================= */
-
-function Hero() {
-  const router = useRouter();
-  const bgImg = "/cfbef7ee6088cac3e2e6c01cfe57bfed.png";
-
-  return (
-    <section
+      <main id="main-content">
+         <section
       className="relative min-h-screen w-full overflow-hidden bg-cover bg-center px-5 pb-16 pt-32 sm:px-8 sm:pt-36 flex flex-col justify-center items-center"
       style={{ backgroundImage: `url('${bgImg}')` }}
     >
@@ -116,13 +272,7 @@ function Hero() {
         animate="show"
         className="relative mx-auto max-w-4xl text-center z-10"
       >
-        <motion.div
-          variants={fadeUp}
-          className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-1.5 text-xs font-medium text-black/70 backdrop-blur-md shadow-sm"
-        >
-          <Zap size={13} className="text-[#6d5dfb]" />
-          Built for fast-moving teams
-        </motion.div>
+        
 
         {/* Updated Font Styling matching attached image */}
         <motion.h1
@@ -166,497 +316,437 @@ function Hero() {
         </motion.p> */}
       </motion.div>
     </section>
-  );
-}
 
-/* ===================== MOCK BOARD PREVIEW ===================== */
+        <section
+          className="trust-section"
+          aria-label="Nexus platform capabilities"
+        >
+          <div className="content-width trust-inner">
+            <p>
+              Everything your team needs to work better together
+            </p>
 
-function MockBoardPreview() {
-  const columns = [
-    {
-      name: "TODO",
-      color: "#c9c9c9",
-      tasks: [
-        { title: "Design onboarding flow", tag: "MEDIUM", tagColor: "#f59e0b" },
-        { title: "Write API docs", tag: "LOW", tagColor: "#22c55e" },
-      ],
-    },
-    {
-      name: "IN PROGRESS",
-      color: "#6d5dfb",
-      tasks: [
-        { title: "Build invite flow", tag: "HIGH", tagColor: "#ef4444" },
-        { title: "Fix drag-drop bug", tag: "HIGH", tagColor: "#ef4444" },
-      ],
-    },
-    {
-      name: "DONE",
-      color: "#22c55e",
-      tasks: [
-        { title: "Set up workspace roles", tag: "MEDIUM", tagColor: "#f59e0b" },
-      ],
-    },
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6 }}
-      className="relative mx-auto -mt-10 max-w-5xl px-5 sm:px-8 z-20"
-    >
-      <div className="rounded-3xl border border-black/[0.07] bg-white p-3 shadow-[0_30px_80px_rgba(0,0,0,0.08)] sm:p-5">
-        <div className="mb-4 flex items-center gap-1.5 px-2">
-          <div className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-          <div className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-          <div className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-3">
-          {columns.map((col, ci) => (
-            <motion.div
-              key={col.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: ci * 0.1 }}
-              className="rounded-2xl bg-[#f7f7f4] p-2.5"
-            >
-              <div className="mb-2 flex items-center justify-between px-1.5">
-                <span className="text-[10px] font-bold tracking-widest text-black/40">
-                  {col.name}
-                </span>
-                <span className="text-[10px] text-black/25">
-                  {col.tasks.length}
-                </span>
-              </div>
-              {col.tasks.map((t) => (
-                <div
-                  key={t.title}
-                  className="mb-2 rounded-xl border border-black/[0.05] bg-white p-3 shadow-sm"
-                >
-                  <p className="text-xs font-semibold">{t.title}</p>
-                  <span
-                    className="mt-2 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold"
-                    style={{
-                      backgroundColor: `${t.tagColor}1A`,
-                      color: t.tagColor,
-                    }}
-                  >
-                    {t.tag}
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ============================= HOW IT WORKS ============================= */
-
-function HowItWorks() {
-  const steps = [
-    {
-      icon: Layers,
-      title: "Create a workspace",
-      desc: "Spin up a home for your team in seconds — no setup, no config.",
-      bg: "#fef3c7",
-      fg: "#d97706",
-    },
-    {
-      icon: Kanban,
-      title: "Organize with boards",
-      desc: "Every project gets its own Kanban board with columns and tasks, ready to go.",
-      bg: "#ede9fe",
-      fg: "#6d5dfb",
-    },
-    {
-      icon: UserPlus,
-      title: "Bring your team in",
-      desc: "Invite members, assign roles, and start moving work forward together.",
-      bg: "#dbeafe",
-      fg: "#2563eb",
-    },
-  ];
-
-  return (
-    <section id="how-it-works" className="mx-auto max-w-6xl px-5 py-24 sm:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="mx-auto mb-14 max-w-xl text-center"
-      >
-        <h2 className="text-3xl font-black tracking-[-0.03em] sm:text-4xl">
-          Up and running in three steps
-        </h2>
-        <p className="mt-3 text-black/50">
-          No lengthy onboarding. Just create, organize, and collaborate.
-        </p>
-      </motion.div>
-
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="grid gap-5 sm:grid-cols-3"
-      >
-        {steps.map((s, i) => (
-          <motion.div
-            key={s.title}
-            variants={fadeUp}
-            whileHover={{ y: -6 }}
-            className="rounded-2xl border border-black/[0.06] bg-white p-6"
-          >
             <div
-              className="mb-5 grid h-12 w-12 place-items-center rounded-xl"
-              style={{ backgroundColor: s.bg, color: s.fg }}
+              className="logo-marquee"
+              aria-label="Projects, tasks, collaboration, activity, and productivity"
             >
-              <s.icon size={22} />
-            </div>
-            <p className="mb-2 text-xs font-bold text-black/30">STEP {i + 1}</p>
-            <h3 className="text-lg font-bold">{s.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-black/55">{s.desc}</p>
-          </motion.div>
-        ))}
-      </motion.div>
-    </section>
-  );
-}
+              <div className="logo-track">
+                <span>PROJECTS</span>
+                <span>TASKS</span>
+                <span>COLLABORATION</span>
+                <span>WORKFLOWS</span>
+                <span>PRODUCTIVITY</span>
+                <span>TEAMWORK</span>
 
-/* ============================= FEATURE GRID ============================= */
-
-function FeatureGrid() {
-  const features = [
-    {
-      icon: Kanban,
-      title: "Drag & drop boards",
-      desc: "Move tasks across columns instantly — changes save automatically.",
-      gradient: "from-[#8b7cff] to-[#6d5dfb]",
-    },
-    {
-      icon: Users,
-      title: "Workspaces & roles",
-      desc: "Owner, Admin and Member roles keep permissions clear and safe.",
-      gradient: "from-[#ff9fd6] to-[#ff6bb3]",
-    },
-    {
-      icon: MessageSquare,
-      title: "Task comments",
-      desc: "Discuss work right where it happens — no jumping between apps.",
-      gradient: "from-[#8bd8ff] to-[#4fb8f0]",
-    },
-    {
-      icon: ShieldCheck,
-      title: "Secure invitations",
-      desc: "Email-verified invites mean only the right people ever join.",
-      gradient: "from-[#a3e6b0] to-[#5fce77]",
-    },
-    {
-      icon: GitBranch,
-      title: "Multiple projects",
-      desc: "Every workspace can hold as many projects and boards as you need.",
-      gradient: "from-[#ffd08b] to-[#f5a63c]",
-    },
-    {
-      icon: Zap,
-      title: "Built for speed",
-      desc: "A fast, focused interface — no clutter, no distractions.",
-      gradient: "from-[#c4b5fd] to-[#8b7cff]",
-    },
-  ];
-
-  return (
-    <section id="features" className="bg-white px-5 py-24 sm:px-8">
-      <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto mb-14 max-w-xl text-center"
-        >
-          <h2 className="text-3xl font-black tracking-[-0.03em] sm:text-4xl">
-            Everything your team needs
-          </h2>
-          <p className="mt-3 text-black/50">
-            Focused features that actually get used — nothing you have to configure for hours.
-          </p>
-        </motion.div>
-
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {features.map((f) => (
-            <motion.div
-              key={f.title}
-              variants={fadeUp}
-              whileHover={{ y: -5 }}
-              className="rounded-2xl border border-black/[0.06] p-6 transition hover:shadow-lg"
-            >
-              <div
-                className={`mb-5 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${f.gradient} text-white`}
-              >
-                <f.icon size={20} />
+                <span aria-hidden="true">PROJECTS</span>
+                <span aria-hidden="true">TASKS</span>
+                <span aria-hidden="true">COLLABORATION</span>
+                <span aria-hidden="true">WORKFLOWS</span>
+                <span aria-hidden="true">PRODUCTIVITY</span>
+                <span aria-hidden="true">TEAMWORK</span>
               </div>
-              <h3 className="font-bold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-black/55">{f.desc}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================= VALUE STRIP ============================= */
-
-function ValueStrip() {
-  const values = [
-    { label: "Unlimited workspaces", sub: "No arbitrary limits while you're getting started" },
-    { label: "Role-based access", sub: "Owner, Admin and Member permissions built in" },
-    { label: "Real task ownership", sub: "Assign, prioritize, and track every task" },
-    { label: "Free in early access", sub: "No credit card, no trial countdown" },
-  ];
-
-  return (
-    <section className="px-5 py-16 sm:px-8">
-      <div className="mx-auto max-w-6xl rounded-3xl bg-[#111] px-6 py-12 text-white sm:px-12">
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {values.map((v) => (
-            <motion.div key={v.label} variants={fadeUp}>
-              <p className="text-lg font-black">{v.label}</p>
-              <p className="mt-2 text-sm text-white/45">{v.sub}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================= GET STARTED STEPS ============================= */
-
-function GetStartedSteps() {
-  const router = useRouter();
-  return (
-    <section className="mx-auto max-w-4xl px-5 py-24 text-center sm:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-      >
-        <h2 className="text-3xl font-black tracking-[-0.03em] sm:text-4xl">
-          Ready when you are
-        </h2>
-        <p className="mx-auto mt-3 max-w-md text-black/50">
-          Create an account, spin up your first workspace, and invite your team
-          — the whole thing takes about two minutes.
-        </p>
-        <button
-          onClick={() => router.push("/login")}
-          className="mx-auto mt-8 flex items-center gap-2 rounded-xl bg-[#6d5dfb] px-7 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#5b4be0]"
-        >
-          <Plus size={16} /> Create your workspace
-        </button>
-      </motion.div>
-    </section>
-  );
-}
-
-/* ============================= FAQ ============================= */
-
-function FAQ() {
-  const faqs = [
-    {
-      q: "Is Nexus free to use?",
-      a: "Yes — Nexus is free to use while it's in early access. No credit card required to get started.",
-    },
-    {
-      q: "How many projects can I create?",
-      a: "As many as you need. Each workspace supports multiple projects, each with its own board.",
-    },
-    {
-      q: "Can I control who sees what?",
-      a: "Yes. Workspace roles (Owner, Admin, Member) control who can invite people, manage projects, and change settings.",
-    },
-    {
-      q: "How do invitations work?",
-      a: "You invite someone by email; they can only accept the invite by logging in with that exact email address, so invites can't be intercepted.",
-    },
-  ];
-  const [open, setOpen] = useState<number | null>(0);
-
-  return (
-    <section id="faq" className="bg-white px-5 py-24 sm:px-8">
-      <div className="mx-auto max-w-2xl">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-10 text-center text-3xl font-black tracking-[-0.03em]"
-        >
-          Frequently asked questions
-        </motion.h2>
-
-        <div className="space-y-3">
-          {faqs.map((f, i) => (
-            <motion.div
-              key={f.q}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="overflow-hidden rounded-2xl border border-black/[0.07]"
-            >
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-semibold"
-              >
-                {f.q}
-                <motion.span animate={{ rotate: open === i ? 180 : 0 }}>
-                  <ChevronDown size={16} className="text-black/40" />
-                </motion.span>
-              </button>
-              <motion.div
-                initial={false}
-                animate={{
-                  height: open === i ? "auto" : 0,
-                  opacity: open === i ? 1 : 0,
-                }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden"
-              >
-                <p className="px-5 pb-4 text-sm leading-6 text-black/55">{f.a}</p>
-              </motion.div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================= FINAL CTA ============================= */
-
-function FinalCTA() {
-  const router = useRouter();
-  return (
-    <section className="relative overflow-hidden px-5 py-24 sm:px-8">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-72 w-[600px] -translate-x-1/2 rounded-full bg-[#8b7cff]/20 blur-[100px]" />
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="relative mx-auto max-w-2xl text-center"
-      >
-        <h2 className="text-3xl font-black tracking-[-0.03em] sm:text-4xl">
-          {"Bring your team's work into one place"}
-        </h2>
-        <p className="mx-auto mt-3 max-w-md text-black/50">
-          {"Start free. Invite your team when you're ready."}
-        </p>
-        <button
-          onClick={() => router.push("/login")}
-          className="mx-auto mt-8 flex items-center gap-2 rounded-xl bg-[#111] px-7 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black"
-        >
-          Get started free <ArrowRight size={15} />
-        </button>
-      </motion.div>
-    </section>
-  );
-}
-
-/* ============================= FOOTER ============================= */
-
-function Footer() {
-  const router = useRouter();
-  const bgImg = "/cfbef7ee6088cac3e2e6c01cfe57bfed.png";
-
-  return (
-    <footer
-      className="relative overflow-hidden bg-cover bg-center px-5 pb-8 pt-20 text-white sm:px-8"
-      style={{ backgroundImage: `url('${bgImg}')` }}
-    >
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#f7f7f4] via-[#0b1f16]/90 to-[#06120c]" />
-
-      <div className="relative mx-auto max-w-6xl">
-        <div className="grid gap-10 sm:grid-cols-3">
-          <div>
-            <div className="text-lg font-black tracking-[-.05em]">
-              NEXUS<span className="text-[#9b91ff]">.</span>
             </div>
-            <p className="mt-3 max-w-xs text-sm text-white/50">
-              {"One calm place for your team's workspaces, boards and tasks."}
+          </div>
+        </section>
+
+        <section
+          id="platform"
+          className="intelligence-section section-pad"
+          aria-labelledby="intelligence-heading"
+        >
+          <div className="content-width intelligence-layout">
+            <div className="section-intro">
+              <p className="eyebrow">
+                Clarity for every project
+              </p>
+
+              <h2 id="intelligence-heading">
+                See the work. Understand the progress.
+              </h2>
+
+              <p>
+                Bring project updates, task ownership, and team activity into
+                one place so you can spend less time searching and more time
+                getting work done.
+              </p>
+
+              <a href="#solutions" className="text-link">
+                Explore project management <ArrowIcon />
+              </a>
+            </div>
+
+            <div
+              className="intelligence-workbench"
+              aria-label="A visual example of project insights"
+            >
+              <div className="workbench-header">
+                <span className="assistant-symbol">
+                  <SparkIcon />
+                </span>
+
+                <span>Nexus AI</span>
+                <span className="workbench-mode">Project assistant</span>
+              </div>
+
+              <div className="workbench-conversation">
+                <div className="workbench-question">
+                  What needs our team&apos;s attention right now?
+                </div>
+
+                <div className="workbench-answer">
+                  <p>
+                    Review the tasks and project activities that may need
+                    attention.
+                  </p>
+
+                  <div className="answer-row">
+                    <span>01</span>
+                    <div>
+                      <strong>Overdue tasks</strong>
+                      <small>Review unfinished work</small>
+                    </div>
+                    <b>Review</b>
+                  </div>
+
+                  <div className="answer-row">
+                    <span>02</span>
+                    <div>
+                      <strong>Task ownership</strong>
+                      <small>Identify unassigned tasks</small>
+                    </div>
+                    <b>Review</b>
+                  </div>
+
+                  <div className="answer-row">
+                    <span>03</span>
+                    <div>
+                      <strong>Project deadlines</strong>
+                      <small>Check upcoming milestones</small>
+                    </div>
+                    <b>Review</b>
+                  </div>
+                </div>
+              </div>
+
+              <div className="workbench-input" aria-hidden="true">
+                <span>Ask a question about your project</span>
+                <i>
+                  <ArrowIcon />
+                </i>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="solutions"
+          className="flow-section section-pad"
+          aria-labelledby="flow-heading"
+        >
+          <div className="content-width">
+            <div className="flow-heading">
+              <p className="eyebrow eyebrow-light">
+                One connected workflow
+              </p>
+
+              <h2 id="flow-heading">
+                From the first idea to the final delivery.
+              </h2>
+
+              <p>
+                Plan the work, collaborate with your team, and track progress
+                at every stage.
+              </p>
+            </div>
+
+            <div className="flow-layout">
+              <div
+                className="flow-tabs"
+                role="tablist"
+                aria-label="Project workflow stages"
+                aria-orientation="vertical"
+              >
+                {flowOrder.map((flow) => (
+                  <button
+                    key={flow}
+                    id={`flow-tab-${flow}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeFlow === flow}
+                    aria-controls={`flow-panel-${flow}`}
+                    tabIndex={activeFlow === flow ? 0 : -1}
+                    className={activeFlow === flow ? "is-active" : ""}
+                    onClick={() => setActiveFlow(flow)}
+                    onKeyDown={(event) =>
+                      handleFlowKeyDown(event, flow)
+                    }
+                  >
+                    <span>{flowContent[flow].label}</span>
+
+                    <b>
+                      {flow === "review"
+                        ? "Plan"
+                        : flow === "request"
+                          ? "Collaborate"
+                          : "Deliver"}
+                    </b>
+
+                    <ArrowIcon />
+                  </button>
+                ))}
+              </div>
+
+              <div
+                className="flow-panel"
+                id={`flow-panel-${activeFlow}`}
+                role="tabpanel"
+                aria-labelledby={`flow-tab-${activeFlow}`}
+              >
+                <p className="eyebrow">
+                  {activeContent.label}
+                </p>
+
+                <h3>{activeContent.title}</h3>
+
+                <p>{activeContent.body}</p>
+
+                <ul>
+                  {activeContent.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+
+                <div className="flow-ai-preview" aria-hidden="true">
+                  <div>
+                    <SparkIcon />
+                    <span>{activeContent.prompt}</span>
+                  </div>
+
+                  <p>{activeContent.answer}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="capability-section section-pad"
+          aria-labelledby="capability-heading"
+        >
+          <div className="content-width">
+            <div className="capability-heading">
+              <p className="eyebrow">
+                Everything your team needs to move forward
+              </p>
+
+              <h2 id="capability-heading">
+                Less scattered work. More meaningful progress.
+              </h2>
+
+              <p>
+                Connect projects, people, and priorities in one organized
+                workspace.
+              </p>
+            </div>
+
+            <div className="capability-list">
+              {capabilities.map((capability) => (
+                <article
+                  key={capability.number}
+                  className="capability-row"
+                >
+                  <span className="capability-number">
+                    {capability.number}
+                  </span>
+
+                  <h3>{capability.title}</h3>
+
+                  <p>{capability.text}</p>
+
+                  <a
+                    href="#contact"
+                    aria-label={`Learn more about ${capability.title}`}
+                  >
+                    <ArrowIcon />
+                  </a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="resources"
+          className="proof-section"
+          aria-labelledby="proof-heading"
+        >
+          <div className="content-width proof-layout">
+            <div>
+              <p className="eyebrow eyebrow-light">
+                The Nexus advantage
+              </p>
+
+              <h2 id="proof-heading">
+                Give great work a better way forward.
+              </h2>
+
+              <p>
+                Create clarity around ownership, simplify collaboration, and
+                help your team stay focused on the work that matters.
+              </p>
+
+              <a className="text-link text-link-light" href="#contact">
+                Explore the Nexus platform <ArrowIcon />
+              </a>
+            </div>
+
+            <div
+              className="proof-figures"
+              aria-label="Key areas of project management"
+            >
+              <div>
+                <strong>01</strong>
+                <span>Projects and boards</span>
+              </div>
+
+              <div>
+                <strong>02</strong>
+                <span>Team collaboration</span>
+              </div>
+
+              <div>
+                <strong>03</strong>
+                <span>Task management</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="faq-section section-pad"
+          aria-labelledby="faq-heading"
+        >
+          <div className="content-width faq-layout">
+            <div className="faq-intro">
+              <p className="eyebrow">
+                Questions, answered
+              </p>
+
+              <h2 id="faq-heading">
+                Everything you need to know about Nexus.
+              </h2>
+
+              <p>
+                Learn how Nexus brings your projects, tasks, and teammates
+                together.
+              </p>
+
+              <a className="text-link" href="#contact">
+                Get in touch <ArrowIcon />
+              </a>
+            </div>
+
+            <div className="faq-list">
+              {faqs.map((faq, index) => {
+                const isOpen = openFaq === index;
+
+                return (
+                  <div className="faq-item" key={faq.question}>
+                    <h3>
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        aria-controls={`faq-panel-${index}`}
+                        onClick={() =>
+                          setOpenFaq(isOpen ? null : index)
+                        }
+                      >
+                        <span>{faq.question}</span>
+
+                        <span className="faq-symbol" aria-hidden="true">
+                          {isOpen ? "-" : "+"}
+                        </span>
+                      </button>
+                    </h3>
+
+                    <div
+                      id={`faq-panel-${index}`}
+                      className={`faq-answer ${isOpen ? "is-open" : ""}`}
+                      role="region"
+                      aria-label={faq.question}
+                    >
+                      <p>{faq.answer}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="contact"
+          className="contact-section"
+          aria-labelledby="contact-heading"
+        >
+          <div className="contact-grid" aria-hidden="true" />
+
+          <div className="content-width contact-content">
+            <p className="eyebrow eyebrow-light">
+              Your team&apos;s next chapter starts here
             </p>
+
+            <h2 id="contact-heading">
+              Ready to bring your work together?
+            </h2>
+
+            <p>
+              Create your workspace, bring your team on board, and turn
+              scattered tasks into coordinated progress.
+            </p>
+
+            <button
+              className="button button-accent"
+              type="button"
+              onClick={() => {
+                window.location.assign("/register");
+              }}
+            >
+              Get started <ArrowIcon />
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer id="company" className="site-footer">
+        <div className="content-width footer-top">
+          <a className="brand brand-dark" href="#top" aria-label="Nexus home">
+            <MarkIcon />
+            <span>NEXUS.</span>
+          </a>
+
+          <div className="footer-links">
+            <a href="#platform">Platform</a>
+            <a href="#solutions">Solutions</a>
+            <a href="#resources">Resources</a>
+            <a href="#contact">Contact</a>
           </div>
 
-          <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-white/40">
-              Product
-            </p>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li>
-                <a href="#features" className="transition hover:text-white">
-                  Features
-                </a>
-              </li>
-              <li>
-                <a href="#how-it-works" className="transition hover:text-white">
-                  How it works
-                </a>
-              </li>
-              <li>
-                <a href="#faq" className="transition hover:text-white">
-                  FAQ
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-white/40">
-              Account
-            </p>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li>
-                <button
-                  onClick={() => router.push("/login")}
-                  className="transition hover:text-white"
-                >
-                  Log in
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => router.push("/login")}
-                  className="transition hover:text-white"
-                >
-                  Get started
-                </button>
-              </li>
-            </ul>
-          </div>
+          <a className="footer-demo" href="#contact">
+            Get started <ArrowIcon />
+          </a>
         </div>
 
-        <div className="mt-14 border-t border-white/10 pt-6 text-center text-xs text-white/35">
-          © 2026 Nexus. All rights reserved.
+        <div className="content-width footer-bottom">
+          <span>(c) 2026 Nexus. All rights reserved.</span>
+
+          <div>
+            <a href="#top">Privacy</a>
+            <a href="#top">Terms</a>
+            <a href="#top">Accessibility</a>
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </div>
   );
 }
