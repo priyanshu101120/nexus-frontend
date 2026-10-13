@@ -12,7 +12,6 @@ const navigation = [
   { label: "Platform", href: "#platform" },
   { label: "Solutions", href: "#solutions" },
   { label: "Resources", href: "#resources" },
-  { label: "Company", href: "#company" },
 ];
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -190,9 +189,6 @@ export default function App() {
 
   return (
     <div className="site-shell">
-      <a className="skip-link" href="#main-content">
-        Skip to content
-      </a>
 
       <header className="site-header">
         <div className="header-inner">
@@ -203,21 +199,21 @@ export default function App() {
 
           <nav className="desktop-nav" aria-label="Primary navigation">
             {navigation.map((item) => (
-              <a key={item.label} href={item.href}>
+              <a key={item.label} href={item.href} onClick={() => router.push(item.href)}>
                 {item.label}
               </a>
             ))}
           </nav>
 
           <div className="header-actions">
-            <a className="login-link" href="#contact">
+            <a className="login-link" onClick={() => router.push("/login")}>
               Log in
             </a>
 
             <button
-              className="button button-small"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#bbeb21] px-8 py-3.5 text-sm font-medium text-white transition hover:scale-[1.02] hover:bg-black sm:w-auto shadow-md"
               type="button"
-              onClick={() => scrollToSection("contact")}
+              onClick={() => router.push("/register")}
             >
               Get started <ArrowIcon />
             </button>
@@ -247,14 +243,14 @@ export default function App() {
             <a
               key={item.label}
               href={item.href}
-              onClick={() => setMenuOpen(false)}
+              onClick={() => router.push("/login")}
             >
               {item.label}
               <ArrowIcon />
             </a>
           ))}
 
-          <a href="#contact" onClick={() => setMenuOpen(false)}>
+          <a href="#contact" onClick={() => router.push("/login")}>
             Log in
             <ArrowIcon />
           </a>
@@ -299,13 +295,13 @@ export default function App() {
         >
           <button
             onClick={() => router.push("/register")}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#6d5dfb] px-8 py-3.5 text-sm font-medium text-white transition hover:scale-[1.02] hover:bg-black sm:w-auto shadow-md"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-black px-8 py-3.5 text-sm font-medium text-white transition hover:scale-[1.02] hover:bg-[#bbeb21] sm:w-auto shadow-md"
           >
             Get started free <ArrowRight size={15} />
           </button>
           <button
             onClick={() => router.push("/login")}
-            className="w-full rounded-full border border-black/10 bg-white/80 backdrop-blur-md px-7 py-3.5 text-sm font-medium text-black/80 transition hover:bg-white sm:w-auto shadow-sm"
+            className="w-full rounded-full border border-black/10 bg-white/80 backdrop-blur-md px-7 py-3.5 text-sm font-medium text-black/80 transition hover:bg-[#bbeb21] sm:w-auto shadow-sm"
           >
             Log in
           </button>
